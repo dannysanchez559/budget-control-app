@@ -14,6 +14,61 @@ The client is Natalia Zhyvopystseva. The developer is Daniel Sanchez. The contra
 
 ---
 
+## Build Philosophy — How We Construct This App
+
+We follow the same sequence a contractor uses to build a house. Every phase must be complete and stable before the next begins. Do not skip ahead.
+
+```
+Phase 1 — BLUEPRINTS      Models + DataStore + AppTheme (no UI at all)
+Phase 2 — FOUNDATION      App entry point + tab shell + navigation skeleton
+Phase 3 — FRAMING         All screens exist, all routes reachable, placeholder content only
+Phase 4 — ROOMS           Feature logic built screen by screen, functional but unstyled
+Phase 5 — FINISHING       UI polish, animations, haptics, empty states, edge cases
+```
+
+### What this means in practice
+
+**Phase 1 — Blueprints (Data + Theme)**
+Build all SwiftData models, DataStore with seed logic, and AppTheme constants. Zero UI. This must compile cleanly before any views are written. Everything downstream depends on this being correct.
+
+**Phase 2 — Foundation (App Shell)**
+`FinanceTrackerApp.swift`, `MainTabView.swift`, onboarding gate (UserDefaults check). The app launches, shows the tab bar, and each tab renders a `Text("placeholder")`. Nothing more.
+
+**Phase 3 — Framing (Screen Skeletons)**
+Every screen file exists. Every sheet and modal can be opened and dismissed. Navigation is fully wired. No real data, no real logic yet — just the scaffolding of every view with correct layout containers and placeholder text. The complete skeleton of the house.
+
+**Phase 4 — Rooms (Feature Logic, Screen by Screen)**
+Build one screen at a time, fully functional with real data before moving to the next. Order:
+1. Add/Edit Transaction sheet (the most-used flow — everything depends on data existing)
+2. Home screen (balance card, wallets, recent transactions)
+3. All Transactions + Search
+4. Stats (pie chart, budgets)
+5. Calendar
+6. Plans (Recurring, Trips, Goals, Subscriptions)
+7. Settings (theme, currency, backup/restore)
+
+Each screen is considered "done" when: data reads and writes correctly, all user actions work, and it does not crash. UI quality at this stage is functional, not polished.
+
+**Phase 5 — Finishing Touches**
+Only after all screens pass Phase 4:
+- Visual polish (spacing, typography, colors refined)
+- Animations and transitions
+- Haptic feedback
+- Empty states
+- Edge cases and error handling
+- Dark mode audit
+- Safe area and device size testing
+
+### Rules for Claude Code sessions
+
+- Always state which Phase and which screen you are working on at the start of a response
+- Never jump to Phase 5 work while Phase 4 screens are incomplete
+- If a bug is found in an earlier phase during later work, fix it immediately before continuing
+- Each phase should end with a clean Xcode build (zero errors, zero warnings if possible)
+- Commit after each phase completes: `git commit -m "Phase X complete: [description]"`
+
+---
+
 ## Tech Stack
 
 | Layer | Choice |
