@@ -79,20 +79,38 @@ enum AppTheme {
         static let md: CGFloat = 16
         static let lg: CGFloat = 24
     }
+
+    // MARK: Typography Scale
+    // All SF Pro. Hierarchy comes from weight + size contrast, not serif.
+    enum Typography {
+        static let fontBalance: CGFloat = 34      // main balance number, weight .thin
+        static let fontTitle: CGFloat = 22        // screen titles, weight .semibold
+        static let fontCardNumber: CGFloat = 17   // card amounts, weight .semibold
+        static let fontBody: CGFloat = 14         // standard body, weight .regular
+        static let fontLabel: CGFloat = 12        // labels and subtitles, weight .medium
+        static let fontCaption: CGFloat = 10      // section headers, weight .semibold
+
+        static let trackingTight: CGFloat = -0.5  // applied to balance and large amounts
+    }
 }
 
 // MARK: - Typography Helpers
 
 extension Font {
-    /// Serif face (New York via .serif design, Georgia is the system fallback).
-    /// Use for balance figures, card titles, and large headings.
+    /// Formerly a serif face. Now all SF Pro — hierarchy comes from weight, not design.
+    /// Kept for existing call sites that used it for balance figures and headings.
     static func appSerif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight, design: .serif)
+        .system(size: size, weight: weight, design: .default)
     }
 
     /// SF Pro system sans — body text, labels, buttons.
     static func appSans(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         .system(size: size, weight: weight, design: .default)
+    }
+
+    /// Monospaced SF Pro — for large numerals that benefit from tabular alignment.
+    static func appMono(_ size: CGFloat, weight: Font.Weight = .semibold) -> Font {
+        .system(size: size, weight: weight, design: .monospaced)
     }
 }
 

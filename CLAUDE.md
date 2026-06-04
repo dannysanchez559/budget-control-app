@@ -153,19 +153,34 @@ All models use `@Model` from SwiftData.
 
 All colors must come from `AppTheme.swift`. Never hardcode color hex values elsewhere in the codebase.
 
-**Light mode (primary):**
-- Background: `#FAFAF8`
-- Surface (cards): `#FFFFFF`
-- Accent: `#A8796A` (muted rose)
-- Income: `#5A8C6A` (sage green)
-- Expense: `#B86A5A` (muted red)
-- Text primary: `#1A1410`
-- Text muted: `#8A7A6E`
-- Border: `#EAE4DC`
+**Design direction:** Slate — cool periwinkle blue, clean and gender-neutral. Simple, approachable, and distinctive from typical finance app aesthetics.
 
-**Typography:**
-- Serif (New York → Georgia fallback): balance figures, card titles, large headings
-- SF Pro (system): all body text, labels, buttons
+**Light mode (primary):**
+- Background: `#F5F6FA`
+- Surface (cards): `#FFFFFF`
+- Accent: `#3D52A0`
+- Accent alt: `#2A3A7C`
+- Income: `#2E6E8E`
+- Expense: `#A03D3D`
+- Danger: `#C0392B`
+- Text primary: `#1A1F3C`
+- Text muted: `#6470A0`
+- Text dim: `#9AA0C4`
+- Border: `#E2E5F0`
+- Border alt: `#C8CEDE`
+
+**Dark mode:**
+- Background: `#0E0F1A`
+- Surface (cards): `#161828`
+- Accent: `#7B8FD4`
+- Income: `#5AAAC8`
+- Expense: `#D47878`
+- Text primary: `#EEEEF8`
+- Text muted: `#8888AA`
+- Border: `#2A2D45`
+- Border alt: `#363A58`
+
+**Typography:** All SF Pro system font, no serif. Use weight and size contrast to create hierarchy. Balance numbers use .thin at 34pt. Amounts use .semibold at 17pt. Body uses .regular at 14pt. Section headers use .semibold at 10pt with wide tracking. Never use New York or Georgia.
 
 **Corner radius constants:** small = 10, medium = 14, large = 20  
 **Tab bar:** 5 tabs — Home, Stats, Calendar, Plans, All  
