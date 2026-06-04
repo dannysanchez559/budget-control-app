@@ -58,7 +58,7 @@ struct HomeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .bottom) {
                 // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 80)
+                Color.clear.frame(height: 100)
             }
             .sheet(item: $editingTransaction) { tx in
                 AddTransactionView(editing: tx)
@@ -162,6 +162,8 @@ struct HomeView: View {
             Text(store.formatAmount(net))
                 .font(.appSerif(40, weight: .semibold))
                 .foregroundStyle(net >= 0 ? AppTheme.Colors.income : AppTheme.Colors.expense)
+                .contentTransition(.numericText())
+                .animation(.easeOut(duration: 0.3), value: net)
 
             if let change = spendingChange {
                 spendingChangeRow(change)

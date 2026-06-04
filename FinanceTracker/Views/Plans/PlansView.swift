@@ -33,7 +33,7 @@ struct PlansView: View {
             .navigationTitle("Plans")
             .safeAreaInset(edge: .bottom) {
                 // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 80)
+                Color.clear.frame(height: 100)
             }
         }
     }
@@ -84,10 +84,13 @@ private struct PlanBadge: View {
     }
 }
 
-/// A thin progress bar with a configurable fill color.
+/// A thin progress bar with a configurable fill color. Fills from zero on
+/// appear with a short eased animation, matching the Stats budget bars.
 private struct PlanProgressBar: View {
     let ratio: Double
     let color: Color
+
+    @State private var appeared = false
 
     var body: some View {
         GeometryReader { geo in
@@ -95,10 +98,15 @@ private struct PlanProgressBar: View {
                 Capsule().fill(AppTheme.Colors.border)
                 Capsule()
                     .fill(color)
-                    .frame(width: max(0, min(ratio, 1)) * geo.size.width)
+                    .frame(width: (appeared ? max(0, min(ratio, 1)) : 0) * geo.size.width)
             }
         }
         .frame(height: 8)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.4).delay(0.1)) {
+                appeared = true
+            }
+        }
     }
 }
 
@@ -436,8 +444,14 @@ private struct SavingsGoalsSection: View {
         guard let goal = goalForDeposit,
               let amount = Double(depositText.replacingOccurrences(of: ",", with: ".")),
               amount > 0 else { return }
+        let wasComplete = goal.target > 0 && goal.saved >= goal.target
         goal.saved = min(goal.target, goal.saved + amount)
         try? modelContext.save()
+        // Celebrate the moment the goal crosses 100% (but not on further deposits
+        // to an already-complete goal).
+        if !wasComplete && goal.target > 0 && goal.saved >= goal.target {
+            HapticManager.success()
+        }
     }
 
     private func delete(_ goal: SavingsGoal) {

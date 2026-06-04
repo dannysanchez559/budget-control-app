@@ -108,7 +108,7 @@ struct CalendarView: View {
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 80)
+                Color.clear.frame(height: 100)
             }
         }
     }

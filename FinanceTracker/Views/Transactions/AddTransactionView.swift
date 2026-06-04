@@ -98,12 +98,13 @@ struct AddTransactionView: View {
         .background(AppTheme.Colors.surface)
         .clipShape(Capsule())
         .overlay(Capsule().stroke(AppTheme.Colors.border, lineWidth: 1))
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: type)
     }
 
     private func typeSegment(title: String, value: String, color: Color) -> some View {
         let isSelected = type == value
         return Button {
-            withAnimation(.easeOut(duration: 0.2)) { type = value }
+            type = value
         } label: {
             Text(title)
                 .font(.appSans(15, weight: .semibold))
@@ -358,6 +359,7 @@ struct AddTransactionView: View {
         }
 
         try? modelContext.save()
+        HapticManager.impact()
         dismiss()
     }
 }

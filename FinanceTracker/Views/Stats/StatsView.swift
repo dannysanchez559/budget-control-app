@@ -26,6 +26,9 @@ struct StatsView: View {
     // reloaded whenever the manager sheet dismisses.
     @State private var budgetLimits: [String: Double] = [:]
 
+    // Drives the budget bars filling from zero when the screen first appears.
+    @State private var barsAppeared = false
+
     // MARK: - Period
 
     enum Period: String, CaseIterable, Identifiable {
@@ -94,12 +97,18 @@ struct StatsView: View {
             .navigationTitle("Stats")
             .safeAreaInset(edge: .bottom) {
                 // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 80)
+                Color.clear.frame(height: 100)
             }
             .sheet(isPresented: $showingBudgetManager, onDismiss: loadBudgets) {
                 BudgetManagerView()
             }
-            .onAppear(perform: loadBudgets)
+            .onAppear {
+                loadBudgets()
+                barsAppeared = false
+                withAnimation(.easeOut(duration: 0.4).delay(0.1)) {
+                    barsAppeared = true
+                }
+            }
         }
     }
 
@@ -271,7 +280,7 @@ struct StatsView: View {
                     .fill(AppTheme.Colors.border)
                 Capsule()
                     .fill(color)
-                    .frame(width: max(0, min(ratio, 1)) * geo.size.width)
+                    .frame(width: (barsAppeared ? max(0, min(ratio, 1)) : 0) * geo.size.width)
             }
         }
         .frame(height: 8)

@@ -66,7 +66,7 @@ struct AllTransactionsView: View {
             .toolbar { toolbarContent }
             .safeAreaInset(edge: .bottom) {
                 // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 80)
+                Color.clear.frame(height: 100)
             }
             .sheet(item: $editingTransaction) { tx in
                 AddTransactionView(editing: tx)
@@ -151,6 +151,7 @@ struct AllTransactionsView: View {
         .contentShape(Rectangle())
         .onTapGesture { editingTransaction = tx }
         .listRowBackground(AppTheme.Colors.surface)
+        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .opacity))
         .swipeActions(edge: .leading) {
             Button { editingTransaction = tx } label: {
                 Label("Edit", systemImage: "pencil")
@@ -182,8 +183,10 @@ struct AllTransactionsView: View {
     // MARK: - Actions
 
     private func delete(_ tx: Transaction) {
-        modelContext.delete(tx)
-        try? modelContext.save()
+        withAnimation {
+            modelContext.delete(tx)
+            try? modelContext.save()
+        }
     }
 
     private func saveAsQuickAction(_ tx: Transaction) {
