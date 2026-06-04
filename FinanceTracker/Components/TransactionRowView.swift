@@ -32,20 +32,20 @@ struct TransactionRowView: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.md) {
             ZStack {
-                Circle()
-                    .fill(Color(hex: category?.colorHex ?? "#8A7A66").opacity(0.18))
+                RoundedRectangle(cornerRadius: AppTheme.Radius.small, style: .continuous)
+                    .fill(Color(hex: category?.colorHex ?? "#8A7A66").opacity(0.15))
                 Text(category?.emoji ?? "📌")
-                    .font(.system(size: 18))
+                    .font(.system(size: 16))
             }
-            .frame(width: 40, height: 40)
+            .frame(width: 32, height: 32)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(category?.label ?? "Uncategorized")
-                    .font(.appSans(16, weight: .medium))
+                    .font(.appSans(AppTheme.Typography.fontBody, weight: .medium))
                     .foregroundStyle(AppTheme.Colors.textPrimary)
                 if !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(.appSans(13))
+                        .font(.appSans(AppTheme.Typography.fontLabel, weight: .medium))
                         .foregroundStyle(AppTheme.Colors.textMuted)
                         .lineLimit(1)
                 }
@@ -54,7 +54,7 @@ struct TransactionRowView: View {
             Spacer()
 
             Text(amountText)
-                .font(.appSerif(16, weight: .medium))
+                .font(.appSans(AppTheme.Typography.fontBody, weight: .semibold))
                 .foregroundStyle(isIncome ? AppTheme.Colors.income : AppTheme.Colors.expense)
         }
         .padding(.vertical, 4)

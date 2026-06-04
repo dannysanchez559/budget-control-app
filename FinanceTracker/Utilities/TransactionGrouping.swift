@@ -18,18 +18,19 @@ struct DayGroup: Identifiable {
 
 enum TransactionGrouping {
 
-    /// Groups transactions by calendar day, newest day first and newest
-    /// transaction first within each day.
-    static func byDay(_ transactions: [Transaction], calendar: Calendar = .current) -> [DayGroup] {
+    /// Groups transactions by calendar day. Newest day/transaction first by
+    /// default; pass `ascending: true` to flip both the section order and the
+    /// within-day order (used by the All Transactions sort toggle).
+    static func byDay(_ transactions: [Transaction], ascending: Bool = false, calendar: Calendar = .current) -> [DayGroup] {
         let buckets = Dictionary(grouping: transactions) { calendar.startOfDay(for: $0.date) }
 
         return buckets
-            .sorted { $0.key > $1.key }
+            .sorted { ascending ? $0.key < $1.key : $0.key > $1.key }
             .map { day, items in
                 DayGroup(
                     id: day,
                     label: dayLabel(for: day, calendar: calendar),
-                    transactions: items.sorted { $0.date > $1.date }
+                    transactions: items.sorted { ascending ? $0.date < $1.date : $0.date > $1.date }
                 )
             }
     }
