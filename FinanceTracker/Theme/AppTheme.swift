@@ -51,18 +51,18 @@ enum AppTheme {
     // MARK: Colors
     // Light values from CLAUDE.md; dark values are the warm-brown adaptation per PRD §5.1.
     enum Colors {
-        static let background  = Color(light: "#FAFAF8", dark: "#1A1512")
-        static let surface     = Color(light: "#FFFFFF", dark: "#241E1A")
-        static let accent      = Color(light: "#A8796A", dark: "#C49A8B")
-        static let income      = Color(light: "#5A8C6A", dark: "#7FB58F")
-        static let expense     = Color(light: "#B86A5A", dark: "#D98B7B")
-        static let textPrimary = Color(light: "#1A1410", dark: "#F2EDE7")
-        static let textMuted   = Color(light: "#8A7A6E", dark: "#A89A8E")
-        static let border      = Color(light: "#EAE4DC", dark: "#3A322C")
+        static let background  = Color(light: "#F5F6FA", dark: "#0E0F1A")
+        static let surface     = Color(light: "#FFFFFF", dark: "#161828")
+        static let accent      = Color(light: "#3D52A0", dark: "#7B8FD4")
+        static let income      = Color(light: "#2E6E8E", dark: "#5AAAC8")
+        static let expense     = Color(light: "#A03D3D", dark: "#D47878")
+        static let textPrimary = Color(light: "#1A1F3C", dark: "#EEEEF8")
+        static let textMuted   = Color(light: "#6470A0", dark: "#8888AA")
+        static let border      = Color(light: "#E2E5F0", dark: "#2A2D45")
         // Accent used for the active-trip banner.
-        static let teal        = Color(light: "#3AA39B", dark: "#5FBEB6")
+        static let teal        = Color(light: "#2A7A9B", dark: "#5FBEB6")
         // Budget alert at 80–99% of limit (100%+ uses `expense`).
-        static let warning     = Color(light: "#D08A2E", dark: "#E0A24E")
+        static let warning     = Color(light: "#B07A20", dark: "#E0A24E")
     }
 
     // MARK: Corner Radius

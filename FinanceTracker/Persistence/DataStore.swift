@@ -60,9 +60,10 @@ final class DataStore {
         set { UserDefaults.standard.set(newValue, forKey: Keys.currencyCode) }
     }
 
-    var isDarkMode: Bool {
-        get { UserDefaults.standard.bool(forKey: Keys.isDarkMode) }
-        set { UserDefaults.standard.set(newValue, forKey: Keys.isDarkMode) }
+    // Stored (not computed) so @Observable tracks it and the toggle updates the
+    // UI live. Seeded once from UserDefaults; didSet writes changes back.
+    var isDarkMode: Bool = UserDefaults.standard.bool(forKey: Keys.isDarkMode) {
+        didSet { UserDefaults.standard.set(isDarkMode, forKey: Keys.isDarkMode) }
     }
 
     var hasOnboarded: Bool {
