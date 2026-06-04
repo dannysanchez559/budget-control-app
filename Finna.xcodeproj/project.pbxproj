@@ -31,6 +31,7 @@
 		B397C1FD4CE861A1C0069D88 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19591336237D3413D43EF838 /* Subscription.swift */; };
 		C91EB2AD05FB531B8516D9D6 /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB3F713292460E270CE089 /* DataStore.swift */; };
 		CA9F049AA48DF9E2FEE36C3F /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F2FF34D789BABE4C69E0E7F /* HapticManager.swift */; };
+		CC77FAD547ECE0724709F0C3 /* AppIconPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB99D6D31ACA45AA0FD01E61 /* AppIconPreview.swift */; };
 		CFABC72B5D206F7E60E735B6 /* AppCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E6985F18C5B0AD548E0719 /* AppCategory.swift */; };
 		D7B93B89D9EA90908BC4CD8F /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80834B4FD76924A185E2234F /* Transaction.swift */; };
 		E441F7896C58F2FAB66F0A47 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C3EA5A1E9CDCA71C67D85F /* HomeView.swift */; };
@@ -56,6 +57,7 @@
 		63F7EBEFECB09E88364C86A7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6BAF5A4BC55DD42F0BA51CE7 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		6C6DCACF1D1A8ABDD90EDC55 /* Finna.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Finna.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		731B2BBF7ADD51A6B29EFE84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		80834B4FD76924A185E2234F /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		8F2FF34D789BABE4C69E0E7F /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		9757172F6554BEC226C5EBCF /* RecurringRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringRule.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 		A4E6985F18C5B0AD548E0719 /* AppCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCategory.swift; sourceTree = "<group>"; };
 		AAFB3F713292460E270CE089 /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
 		B9D20FEB769A858B745F8A1A /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		CB99D6D31ACA45AA0FD01E61 /* AppIconPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconPreview.swift; sourceTree = "<group>"; };
 		CF607AC3B99AC8B170C54DC0 /* FloatingAddButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingAddButton.swift; sourceTree = "<group>"; };
 		CFB6416E375E9AD8A537AD1E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D522CF076A958B84326D5DE5 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
@@ -141,6 +144,7 @@
 		91602930E5C9302D64BDEBD0 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				CB99D6D31ACA45AA0FD01E61 /* AppIconPreview.swift */,
 				E352C6064BB169EAE8A0D0F8 /* CardView.swift */,
 				CF607AC3B99AC8B170C54DC0 /* FloatingAddButton.swift */,
 				8F2FF34D789BABE4C69E0E7F /* HapticManager.swift */,
@@ -212,6 +216,7 @@
 				3840BA54218FB896C9D0BA7B /* Assets.xcassets */,
 				CFB6416E375E9AD8A537AD1E /* ContentView.swift */,
 				0A01A2127C2AEF51E19EB91A /* FinanceTrackerApp.swift */,
+				731B2BBF7ADD51A6B29EFE84 /* Info.plist */,
 				6BAF5A4BC55DD42F0BA51CE7 /* MainTabView.swift */,
 				91602930E5C9302D64BDEBD0 /* Components */,
 				A6DAE6D2F700E56AEB4CE862 /* Models */,
@@ -309,6 +314,7 @@
 				9168FCC7917F530F73C8EDB0 /* AddTransactionView.swift in Sources */,
 				F9C7975D55E337064693F594 /* AllTransactionsView.swift in Sources */,
 				CFABC72B5D206F7E60E735B6 /* AppCategory.swift in Sources */,
+				CC77FAD547ECE0724709F0C3 /* AppIconPreview.swift in Sources */,
 				AA69A4631166F6D8B09363BF /* AppTheme.swift in Sources */,
 				8AF23617AD962B823D67C473 /* BudgetManagerView.swift in Sources */,
 				772A2529D36727E0A4890764 /* CalendarView.swift in Sources */,
@@ -406,10 +412,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_FILE = FinanceTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -429,10 +432,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_FILE = FinanceTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
