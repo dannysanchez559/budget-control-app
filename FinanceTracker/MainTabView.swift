@@ -2,57 +2,66 @@
 //  MainTabView.swift
 //  Finna
 //
-//  5-tab shell (Home, Stats, Calendar, Plans, All) with a floating add button
-//  overlaid above the tab bar. The add button is hidden on the Plans tab.
+//  App shell. A custom bottom tab bar (CustomTabBar) drives a ZStack of the
+//  five destination screens, with the floating add button overlaid above the
+//  bar. The system TabView is no longer used. Each destination owns its own
+//  NavigationStack and hides the system tab bar.
 //
 
 import SwiftUI
 
 struct MainTabView: View {
 
-    enum Tab: Int, CaseIterable {
-        case home, stats, calendar, plans, all
-    }
-
-    @State private var selectedTab: Tab = .home
+    // 0: Home, 1: Stats, 2: Calendar, 3: Plans, 4: All
+    @State private var selectedTab: Int = 0
     @State private var showingAddTransaction = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabView(selection: $selectedTab) {
-                HomeView()
-                    .tabItem { Label("Home", systemImage: "house.fill") }
-                    .tag(Tab.home)
+            // Active destination — each screen already provides its own
+            // NavigationStack, so no extra wrapping is needed here.
+            destinationView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                StatsView()
-                    .tabItem { Label("Stats", systemImage: "chart.pie.fill") }
-                    .tag(Tab.stats)
-
-                CalendarView()
-                    .tabItem { Label("Calendar", systemImage: "calendar") }
-                    .tag(Tab.calendar)
-
-                PlansView()
-                    .tabItem { Label("Plans", systemImage: "checklist") }
-                    .tag(Tab.plans)
-
-                AllTransactionsView()
-                    .tabItem { Label("All", systemImage: "list.bullet") }
-                    .tag(Tab.all)
-            }
-
-            // Floating add button — hidden on the Plans tab.
-            if selectedTab != .plans {
+            // Floating add button — hidden on the Plans tab (index 3).
+            if selectedTab != 3 {
                 FloatingAddButton {
                     showingAddTransaction = true
                 }
-                .padding(.bottom, 60) // sits above the tab bar
+                .padding(.bottom, 90) // sits above the custom tab bar
+            }
+
+            // Custom tab bar pinned to the bottom; Spacer pushes content up.
+            VStack(spacing: 0) {
+                Spacer()
+                CustomTabBar(selectedTab: $selectedTab)
             }
         }
         .sheet(isPresented: $showingAddTransaction) {
             AddTransactionView(editing: nil)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
+        }
+    }
+
+    @ViewBuilder
+    private var destinationView: some View {
+        switch selectedTab {
+        case 0:
+            HomeView()
+                .toolbar(.hidden, for: .tabBar)
+        case 1:
+            StatsView()
+                .toolbar(.hidden, for: .tabBar)
+        case 2:
+            CalendarView()
+                .toolbar(.hidden, for: .tabBar)
+        case 3:
+            PlansView()
+                .toolbar(.hidden, for: .tabBar)
+        default:
+            AllTransactionsView()
+                .toolbar(.hidden, for: .tabBar)
         }
     }
 }

@@ -69,7 +69,7 @@ enum AppTheme {
         // Accent used for the active-trip banner.
         static let teal        = Color(light: "#2A7A9B", dark: "#5FBEB6")
         // Budget alert at 80–99% of limit (100%+ uses `expense`).
-        static let warning     = Color(light: "#B07A20", dark: "#E0A24E")
+        static let warning     = Color(light: "#E0924A", dark: "#E0A24E")
     }
 
     // MARK: Corner Radius

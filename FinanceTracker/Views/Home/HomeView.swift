@@ -258,13 +258,12 @@ struct HomeView: View {
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppTheme.Spacing.sm) {
+                HStack(spacing: 16) {
                     ForEach(wallets) { wallet in
                         walletCard(wallet)
                     }
                 }
-                .padding(.horizontal, 2) // keeps the shadow from clipping
-                .padding(.vertical, 4)
+                .padding(.horizontal, 20)
             }
         }
     }
@@ -274,32 +273,25 @@ struct HomeView: View {
         return Button {
             // TODO: Phase 4 — present edit/delete sheet for this wallet.
         } label: {
-            VStack(alignment: .leading, spacing: 0) {
-                // Full-width color bar; top corners are rounded by the outer clip.
-                Rectangle()
-                    .fill(Color(hex: wallet.colorHex))
-                    .frame(height: 3)
-
-                VStack(alignment: .leading, spacing: 6) {
+            VStack(spacing: AppTheme.Spacing.sm) {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: wallet.colorHex).opacity(0.2))
                     Text(wallet.emoji)
-                        .font(.system(size: 20))
-                    Text(wallet.name)
-                        .font(.appSans(AppTheme.Typography.fontCaption, weight: .medium))
-                        .foregroundStyle(AppTheme.Colors.textMuted)
-                        .lineLimit(1)
-                    Text(store.formatAmount(balance))
-                        .font(.appSans(AppTheme.Typography.fontBody, weight: .semibold))
-                        .foregroundStyle(AppTheme.Colors.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .font(.system(size: 22))
                 }
-                .padding(10)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(width: 56, height: 56)
+
+                Text(wallet.name)
+                    .font(.appSans(AppTheme.Typography.fontCaption, weight: .medium))
+                    .foregroundStyle(AppTheme.Colors.textMuted)
+                    .lineLimit(1)
+
+                Text(store.formatAmount(balance))
+                    .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
+                    .foregroundStyle(AppTheme.Colors.textPrimary)
+                    .lineLimit(1)
             }
-            .frame(width: 100)
-            .background(AppTheme.Colors.surface)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.medium, style: .continuous))
-            .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }
@@ -364,7 +356,7 @@ struct HomeView: View {
     private func budgetRow(_ item: BudgetItem) -> some View {
         let fillColor: Color = {
             if item.ratio >= 1 { return AppTheme.Colors.expense }
-            if item.ratio >= 0.8 { return Color(hex: "#E0924A") }
+            if item.ratio >= 0.8 { return AppTheme.Colors.warning }
             return AppTheme.Colors.accent
         }()
 
