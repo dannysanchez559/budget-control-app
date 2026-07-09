@@ -23,6 +23,9 @@ struct AllTransactionsView: View {
     @State private var pendingDelete: Transaction?
     @State private var showingSearch = false
     @State private var sortMode: SortMode = .dateDescending
+    @State private var isSelecting = false
+    @State private var selectedIds: Set<UUID> = []
+    @State private var showingBulkDeleteConfirm = false
 
     // Mirrors UserDefaults so the repeat button can disable at the 6 cap.
     @State private var quickActions: [QuickAction] = []
@@ -65,10 +68,7 @@ struct AllTransactionsView: View {
             .navigationTitle("All")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
-            .safeAreaInset(edge: .bottom) {
-                // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 100)
-            }
+            .tabShellBottomInset()
             .sheet(item: $editingTransaction) { tx in
                 AddTransactionView(editing: tx)
             }
@@ -85,6 +85,15 @@ struct AllTransactionsView: View {
             } message: { _ in
                 Text("This can't be undone.")
             }
+            .confirmationDialog(
+                "Delete \(selectedIds.count) transaction\(selectedIds.count == 1 ? "" : "s")?",
+                isPresented: $showingBulkDeleteConfirm
+            ) {
+                Button("Delete", role: .destructive) { deleteSelected() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This can't be undone.")
+            }
             .onAppear { quickActions = store.quickActions }
         }
     }
@@ -99,15 +108,32 @@ struct AllTransactionsView: View {
                 .foregroundStyle(AppTheme.Colors.textPrimary)
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
-            Button { sortMode = sortMode.next } label: {
-                Image(systemName: sortMode.iconName)
+            if !transactions.isEmpty {
+                Button(isSelecting ? "Done" : "Select") {
+                    isSelecting.toggle()
+                    if !isSelecting { selectedIds.removeAll() }
+                }
+                .font(.appSans(15, weight: .semibold))
+                .tint(AppTheme.Colors.accent)
             }
-            .tint(AppTheme.Colors.accent)
 
-            Button { showingSearch = true } label: {
-                Image(systemName: "magnifyingglass")
+            if isSelecting, !selectedIds.isEmpty {
+                Button("Delete") { showingBulkDeleteConfirm = true }
+                    .font(.appSans(15, weight: .semibold))
+                    .tint(AppTheme.Colors.danger)
             }
-            .tint(AppTheme.Colors.accent)
+
+            if !isSelecting {
+                Button { sortMode = sortMode.next } label: {
+                    Image(systemName: sortMode.iconName)
+                }
+                .tint(AppTheme.Colors.accent)
+
+                Button { showingSearch = true } label: {
+                    Image(systemName: "magnifyingglass")
+                }
+                .tint(AppTheme.Colors.accent)
+            }
         }
     }
 
@@ -135,42 +161,60 @@ struct AllTransactionsView: View {
         .scrollContentBackground(.hidden)
     }
 
-    /// A single row: the shared row view plus an inline repeat button, wrapped
-    /// with tap-to-edit and the leading/trailing swipe actions.
     private func row(_ tx: Transaction) -> some View {
         HStack(spacing: AppTheme.Spacing.sm) {
+            if isSelecting {
+                Image(systemName: selectedIds.contains(tx.id) ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(selectedIds.contains(tx.id) ? AppTheme.Colors.accent : AppTheme.Colors.textMuted)
+            }
+
             TransactionRowView(
                 transaction: tx,
                 category: categoryById[tx.categoryId],
                 wallet: walletById[tx.walletId]
             )
 
-            Button { saveAsQuickAction(tx) } label: {
-                Image(systemName: "repeat")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(AppTheme.Colors.textMuted)
+            if !isSelecting {
+                Button { saveAsQuickAction(tx) } label: {
+                    Image(systemName: "repeat")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(AppTheme.Colors.textMuted)
+                }
+                .buttonStyle(.plain)
+                .disabled(quickActions.count >= 6)
+                .opacity(quickActions.count >= 6 ? 0.3 : 1)
             }
-            .buttonStyle(.plain)
-            .disabled(quickActions.count >= 6)
-            .opacity(quickActions.count >= 6 ? 0.3 : 1)
         }
         .contentShape(Rectangle())
-        .onTapGesture { editingTransaction = tx }
+        .onTapGesture {
+            if isSelecting {
+                toggleSelection(tx)
+            } else {
+                editingTransaction = tx
+            }
+        }
         .listRowBackground(AppTheme.Colors.surface)
         .listRowSeparatorTint(AppTheme.Colors.borderAlt)
         // Inset the divider to start at the transaction text, not under the
         // 44pt icon badge (badge width + the row's internal spacing).
-        .alignmentGuide(.listRowSeparatorLeading) { _ in 44 + AppTheme.Spacing.md }
-        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .opacity))
-        .swipeActions(edge: .leading) {
-            Button { editingTransaction = tx } label: {
-                Label("Edit", systemImage: "pencil")
-            }
-            .tint(AppTheme.Colors.accent)
+        .alignmentGuide(.listRowSeparatorLeading) { _ in
+            (isSelecting ? 22 + AppTheme.Spacing.sm : 0) + 44 + AppTheme.Spacing.md
         }
-        .swipeActions(edge: .trailing) {
-            Button(role: .destructive) { pendingDelete = tx } label: {
-                Label("Delete", systemImage: "trash")
+        .transition(.asymmetric(insertion: .push(from: .bottom), removal: .opacity))
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+            if !isSelecting {
+                Button { editingTransaction = tx } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                .tint(AppTheme.Colors.accent)
+            }
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            if !isSelecting {
+                Button(role: .destructive) { pendingDelete = tx } label: {
+                    Label("Delete", systemImage: "trash")
+                }
             }
         }
     }
@@ -196,6 +240,26 @@ struct AllTransactionsView: View {
         withAnimation {
             modelContext.delete(tx)
             try? modelContext.save()
+            selectedIds.remove(tx.id)
+        }
+    }
+
+    private func toggleSelection(_ tx: Transaction) {
+        if selectedIds.contains(tx.id) {
+            selectedIds.remove(tx.id)
+        } else {
+            selectedIds.insert(tx.id)
+        }
+    }
+
+    private func deleteSelected() {
+        withAnimation {
+            for tx in transactions where selectedIds.contains(tx.id) {
+                modelContext.delete(tx)
+            }
+            try? modelContext.save()
+            selectedIds.removeAll()
+            isSelecting = false
         }
     }
 

@@ -40,10 +40,7 @@ struct PlansView: View {
                         .foregroundStyle(AppTheme.Colors.textPrimary)
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 100)
-            }
+            .tabShellBottomInset(showsFloatingAction: false)
         }
     }
 }

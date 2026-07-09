@@ -25,7 +25,10 @@ struct TransactionRowView: View {
     }
 
     private var symbol: String {
-        IconMap.symbol(forCategory: category?.id ?? transaction.categoryId)
+        IconMap.symbol(
+            forCategory: category?.id ?? transaction.categoryId,
+            storedIcon: category?.emoji ?? ""
+        )
     }
 
     private var amountText: String {

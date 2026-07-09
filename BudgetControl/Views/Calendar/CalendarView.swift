@@ -13,20 +13,36 @@ import SwiftUI
 import SwiftData
 
 struct CalendarView: View {
+    @Environment(\.modelContext) private var modelContext
     @Environment(DataStore.self) private var store
 
     @Query private var transactions: [Transaction]
     @Query private var wallets: [Wallet]
     @Query private var categories: [AppCategory]
 
+    /// Bound to MainTabView so the + button pre-fills this day on new transactions.
+    @Binding var selectedDate: Date
+
     // First day of the month currently on screen.
     @State private var displayedMonth: Date = Calendar.current.startOfMonth(for: .now)
-    // The day whose transactions fill the detail card. Defaults to today.
-    @State private var selectedDate: Date = Calendar.current.startOfDay(for: .now)
+
+    @State private var editingTransaction: Transaction?
+    @State private var pendingDelete: Transaction?
+    @State private var isSelecting = false
+    @State private var selectedIds: Set<UUID> = []
+    @State private var showingBulkDeleteConfirm = false
 
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.xs),
                                 count: 7)
+
+    private var deleteBinding: Binding<Bool> {
+        Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } })
+    }
+
+    init(selectedDate: Binding<Date> = .constant(Calendar.current.startOfDay(for: .now))) {
+        _selectedDate = selectedDate
+    }
 
     // MARK: - Lookups
 
@@ -107,9 +123,28 @@ struct CalendarView: View {
             .background(AppTheme.Colors.background)
             .navigationTitle("Calendar")
             .navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
-                // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 100)
+            .tabShellBottomInset()
+            .sheet(item: $editingTransaction) { tx in
+                AddTransactionView(editing: tx)
+            }
+            .confirmationDialog(
+                "Delete this transaction?",
+                isPresented: deleteBinding,
+                presenting: pendingDelete
+            ) { tx in
+                Button("Delete", role: .destructive) { delete(tx) }
+                Button("Cancel", role: .cancel) {}
+            } message: { _ in
+                Text("This can't be undone.")
+            }
+            .confirmationDialog(
+                "Delete \(selectedIds.count) transaction\(selectedIds.count == 1 ? "" : "s")?",
+                isPresented: $showingBulkDeleteConfirm
+            ) {
+                Button("Delete", role: .destructive) { deleteSelected() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This can't be undone.")
             }
         }
     }
@@ -212,26 +247,88 @@ struct CalendarView: View {
 
     private var detailCard: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text(selectedDayTitle.uppercased())
-                .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
-                .foregroundStyle(AppTheme.Colors.textMuted)
+            HStack {
+                Text(selectedDayTitle.uppercased())
+                    .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
+                    .foregroundStyle(AppTheme.Colors.textMuted)
+                Spacer()
+                if !selectedTransactions.isEmpty {
+                    Button(isSelecting ? "Done" : "Select") {
+                        isSelecting.toggle()
+                        if !isSelecting { selectedIds.removeAll() }
+                    }
+                    .font(.appSans(13, weight: .semibold))
+                    .foregroundStyle(AppTheme.Colors.accent)
+                }
+            }
 
             if selectedTransactions.isEmpty {
                 emptyState
             } else {
-                VStack(spacing: AppTheme.Spacing.sm) {
+                List {
                     ForEach(selectedTransactions) { tx in
-                        TransactionRowView(
-                            transaction: tx,
-                            category: categoryById[tx.categoryId],
-                            wallet: walletById[tx.walletId]
-                        )
+                        calendarRow(tx)
                     }
+                }
+                .listStyle(.plain)
+                .scrollDisabled(true)
+                .scrollContentBackground(.hidden)
+                .frame(height: CGFloat(selectedTransactions.count) * 64 + 8)
+
+                if isSelecting, !selectedIds.isEmpty {
+                    Button(role: .destructive) {
+                        showingBulkDeleteConfirm = true
+                    } label: {
+                        Text("Delete Selected (\(selectedIds.count))")
+                            .font(.appSans(15, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppTheme.Colors.danger)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle(padding: AppTheme.Spacing.md)
+    }
+
+    private func calendarRow(_ tx: Transaction) -> some View {
+        HStack(spacing: AppTheme.Spacing.sm) {
+            if isSelecting {
+                Image(systemName: selectedIds.contains(tx.id) ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(selectedIds.contains(tx.id) ? AppTheme.Colors.accent : AppTheme.Colors.textMuted)
+                    .onTapGesture { toggleSelection(tx) }
+            }
+
+            TransactionRowView(
+                transaction: tx,
+                category: categoryById[tx.categoryId],
+                wallet: walletById[tx.walletId]
+            )
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if isSelecting {
+                toggleSelection(tx)
+            } else {
+                editingTransaction = tx
+            }
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+        .listRowSeparator(.hidden)
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+            Button { editingTransaction = tx } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+            .tint(AppTheme.Colors.accent)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) { pendingDelete = tx } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
 
     private var emptyState: some View {
@@ -249,6 +346,33 @@ struct CalendarView: View {
 
     // MARK: - Actions
 
+    private func toggleSelection(_ tx: Transaction) {
+        if selectedIds.contains(tx.id) {
+            selectedIds.remove(tx.id)
+        } else {
+            selectedIds.insert(tx.id)
+        }
+    }
+
+    private func delete(_ tx: Transaction) {
+        withAnimation {
+            modelContext.delete(tx)
+            try? modelContext.save()
+            selectedIds.remove(tx.id)
+        }
+    }
+
+    private func deleteSelected() {
+        withAnimation {
+            for tx in selectedTransactions where selectedIds.contains(tx.id) {
+                modelContext.delete(tx)
+            }
+            try? modelContext.save()
+            selectedIds.removeAll()
+            isSelecting = false
+        }
+    }
+
     private func step(by months: Int) {
         guard let next = calendar.date(byAdding: .month, value: months, to: displayedMonth) else { return }
         displayedMonth = calendar.startOfMonth(for: next)
@@ -265,7 +389,7 @@ extension Calendar {
 }
 
 #Preview {
-    CalendarView()
+    CalendarView(selectedDate: .constant(.now))
         .environment(DataStore())
         .modelContainer(DataStore.modelContainer)
 }

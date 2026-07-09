@@ -22,10 +22,6 @@ struct StatsView: View {
     @State private var period: Period = .month
     @State private var showingBudgetManager = false
 
-    // UserDefaults-backed budgets aren't @Observable; mirror in local state,
-    // reloaded whenever the manager sheet dismisses.
-    @State private var budgetLimits: [String: Double] = [:]
-
     // Drives the budget bars filling from zero when the screen first appears.
     @State private var barsAppeared = false
 
@@ -116,15 +112,11 @@ struct StatsView: View {
                         .foregroundStyle(AppTheme.Colors.textPrimary)
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 100)
-            }
-            .sheet(isPresented: $showingBudgetManager, onDismiss: loadBudgets) {
+            .tabShellBottomInset()
+            .sheet(isPresented: $showingBudgetManager) {
                 BudgetManagerView()
             }
             .onAppear {
-                loadBudgets()
                 barsAppeared = false
                 withAnimation(.easeOut(duration: 0.4).delay(0.1)) {
                     barsAppeared = true
@@ -167,7 +159,7 @@ struct StatsView: View {
         Chart(coloredSlices) { item in
             SectorMark(
                 angle: .value("Amount", item.slice.amount),
-                innerRadius: .ratio(0.62),
+                innerRadius: .ratio(0.70),
                 angularInset: 1.5
             )
             .cornerRadius(3)
@@ -186,6 +178,7 @@ struct StatsView: View {
                     .foregroundStyle(AppTheme.Colors.textPrimary)
                     .tracking(AppTheme.Typography.trackingTight)
             }
+            .padding(8)
         }
     }
 
@@ -240,11 +233,19 @@ struct StatsView: View {
 
     // MARK: - Budgets
 
-    /// Categories that have a budget set, paired with their period spend.
+    /// Expense transactions in the current calendar month (budget limits are monthly).
+    private var monthExpenseTransactions: [Transaction] {
+        transactions.filter {
+            $0.type == "expense"
+                && Calendar.current.isDate($0.date, equalTo: .now, toGranularity: .month)
+        }
+    }
+
+    /// Categories that have a budget set, paired with their month-to-date spend.
     private var budgetRows: [BudgetRow] {
         expenseCategories.compactMap { category -> BudgetRow? in
-            guard let limit = budgetLimits[category.id], limit > 0 else { return nil }
-            let spent = periodExpenses
+            guard let limit = store.budgetLimits[category.id], limit > 0 else { return nil }
+            let spent = monthExpenseTransactions
                 .filter { $0.categoryId == category.id }
                 .reduce(0) { $0 + $1.amount }
             return BudgetRow(category: category, spent: spent, limit: limit)
@@ -311,12 +312,6 @@ struct StatsView: View {
             }
         }
         .frame(height: 8)
-    }
-
-    // MARK: - Actions
-
-    private func loadBudgets() {
-        budgetLimits = store.budgetLimits
     }
 }
 

@@ -18,8 +18,10 @@ import Foundation
 /// both forms so lookups work against the real seed ids without changing them.
 struct IconMap {
 
-    /// SF Symbol for a category id. Falls back to `circle.fill` for unknown ids.
-    static func symbol(forCategory id: String) -> String {
+    /// SF Symbol for a category id. Falls back to `storedIcon` (custom categories
+    /// store an ASCII SF Symbol name in the model's emoji field), then
+    /// `circle.fill` for unknown ids.
+    static func symbol(forCategory id: String, storedIcon: String = "") -> String {
         switch normalize(id) {
         case "food":      return "fork.knife"
         case "transport": return "bus"
@@ -34,17 +36,22 @@ struct IconMap {
         case "gift":      return "gift.fill"
         case "invest":    return "chart.line.uptrend.xyaxis"
         case "other_i":   return "sparkles"
-        default:          return "circle.fill"
+        default:
+            if !storedIcon.isEmpty, storedIcon.allSatisfy(\.isASCII) { return storedIcon }
+            return "circle.fill"
         }
     }
 
-    /// SF Symbol for a wallet id. Falls back to `wallet.pass.fill` for unknown ids.
-    static func symbol(forWallet id: String) -> String {
+    /// SF Symbol for a wallet id. Falls back to `storedIcon` for custom wallets,
+    /// then `wallet.pass.fill` for unknown ids.
+    static func symbol(forWallet id: String, storedIcon: String = "") -> String {
         switch normalize(id) {
         case "cash":    return "banknote.fill"
         case "card":    return "creditcard.fill"
         case "savings": return "building.columns.fill"
-        default:        return "wallet.pass.fill"
+        default:
+            if !storedIcon.isEmpty, storedIcon.allSatisfy(\.isASCII) { return storedIcon }
+            return "wallet.pass.fill"
         }
     }
 

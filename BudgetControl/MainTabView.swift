@@ -14,7 +14,12 @@ struct MainTabView: View {
 
     // 0: Home, 1: Stats, 2: Calendar, 3: Plans, 4: All
     @State private var selectedTab: Int = 0
-    @State private var showingAddTransaction = false
+    /// Fresh context each time + is tapped — guarantees the sheet picks up the
+    /// current calendar selection (item-based sheet, not isPresented).
+    @State private var addTransactionContext: AddTransactionContext?
+
+    /// Calendar tab exposes the selected day for new transactions.
+    @State private var calendarSelectedDate: Date = Calendar.current.startOfDay(for: .now)
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -25,10 +30,17 @@ struct MainTabView: View {
 
             // Floating add button — hidden on the Plans tab (index 3).
             if selectedTab != 3 {
-                FloatingAddButton {
-                    showingAddTransaction = true
+                HStack {
+                    Spacer()
+                    FloatingAddButton {
+                        let initialDate = selectedTab == 2
+                            ? Calendar.current.startOfDay(for: calendarSelectedDate)
+                            : nil
+                        addTransactionContext = AddTransactionContext(initialDate: initialDate)
+                    }
+                    .padding(.trailing, 20)
                 }
-                .padding(.bottom, 90) // sits above the custom tab bar
+                .padding(.bottom, AppTheme.Layout.floatingActionBottomOffset)
             }
 
             // Custom tab bar pinned to the bottom; Spacer pushes content up.
@@ -37,8 +49,8 @@ struct MainTabView: View {
                 CustomTabBar(selectedTab: $selectedTab)
             }
         }
-        .sheet(isPresented: $showingAddTransaction) {
-            AddTransactionView(editing: nil)
+        .sheet(item: $addTransactionContext) { context in
+            AddTransactionView(editing: nil, initialDate: context.initialDate)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
@@ -54,7 +66,7 @@ struct MainTabView: View {
             StatsView()
                 .toolbar(.hidden, for: .tabBar)
         case 2:
-            CalendarView()
+            CalendarView(selectedDate: $calendarSelectedDate)
                 .toolbar(.hidden, for: .tabBar)
         case 3:
             PlansView()
@@ -64,6 +76,12 @@ struct MainTabView: View {
                 .toolbar(.hidden, for: .tabBar)
         }
     }
+}
+
+/// Payload for presenting a new-transaction sheet with an optional pre-filled date.
+private struct AddTransactionContext: Identifiable {
+    let id = UUID()
+    let initialDate: Date?
 }
 
 #Preview {

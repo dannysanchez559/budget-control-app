@@ -22,9 +22,24 @@ struct AddTransactionView: View {
 
     /// Pass an existing transaction to edit it; nil creates a new one.
     var editing: Transaction?
+    /// Pre-fill the date on new transactions (e.g. Calendar tab selected day).
+    var initialDate: Date?
 
-    init(editing: Transaction? = nil) {
+    init(editing: Transaction? = nil, initialDate: Date? = nil) {
         self.editing = editing
+        self.initialDate = initialDate
+
+        if let tx = editing {
+            _type = State(initialValue: tx.type)
+            _amountText = State(initialValue: tx.amount == 0 ? "" : String(format: "%g", tx.amount))
+            _walletId = State(initialValue: tx.walletId)
+            _categoryId = State(initialValue: tx.categoryId)
+            _date = State(initialValue: tx.date)
+            _note = State(initialValue: tx.note)
+            _tagsText = State(initialValue: tx.tags.joined(separator: ", "))
+        } else if let initialDate {
+            _date = State(initialValue: Calendar.current.startOfDay(for: initialDate))
+        }
     }
 
     @Query(sort: \Wallet.name) private var wallets: [Wallet]
@@ -37,6 +52,7 @@ struct AddTransactionView: View {
     @State private var date: Date = .now
     @State private var note: String = ""
     @State private var tagsText: String = ""
+    @State private var showingAddCategory = false
 
     private var amountValue: Double {
         Double(amountText.replacingOccurrences(of: ",", with: ".")) ?? 0
@@ -85,6 +101,11 @@ struct AddTransactionView: View {
             }
             .onAppear(perform: loadInitialState)
             .onChange(of: type) { _, _ in ensureCategoryMatchesType() }
+            .sheet(isPresented: $showingAddCategory) {
+                AddCategoryView(type: type) { newId in
+                    categoryId = newId
+                }
+            }
         }
     }
 
@@ -209,7 +230,7 @@ struct AddTransactionView: View {
         } label: {
             VStack(spacing: 6) {
                 IconBadge(
-                    symbol: IconMap.symbol(forCategory: category.id),
+                    symbol: IconMap.symbol(forCategory: category.id, storedIcon: category.emoji),
                     style: IconMap.pastel(forCategory: category.id),
                     size: 40
                 )
@@ -232,10 +253,9 @@ struct AddTransactionView: View {
         .buttonStyle(.plain)
     }
 
-    /// "+ New" stub — Add Category sheet is wired in a later Phase 4 screen.
     private var newCategoryCell: some View {
         Button {
-            // TODO: Phase 4 — present Add Category sheet.
+            showingAddCategory = true
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: "plus")
@@ -322,6 +342,7 @@ struct AddTransactionView: View {
             // Default to the user's default wallet (or the first available).
             walletId = wallets.first(where: { $0.isDefault })?.id
                 ?? wallets.first?.id ?? ""
+            date = initialDate ?? .now
             ensureCategoryMatchesType()
         }
     }
@@ -343,8 +364,12 @@ struct AddTransactionView: View {
     private func save() {
         guard canSave else { return }
 
-        // Auto-tag to the active trip for expenses only.
-        let tripId = (type == "expense") ? store.activeTripId : nil
+        // Auto-tag to the active trip for expenses; preserve an existing trip tag on edit.
+        let tripId: String? = {
+            guard type == "expense" else { return nil }
+            if let tx = editing { return tx.tripId ?? store.activeTripId }
+            return store.activeTripId
+        }()
 
         if let tx = editing {
             tx.type = type

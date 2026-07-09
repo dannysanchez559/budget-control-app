@@ -27,6 +27,8 @@ struct HomeView: View {
     @State private var showingBudgetManager = false
     @State private var showingSearch = false
     @State private var showingAllTransactions = false
+    @State private var showingWalletManager = false
+    @State private var pendingDelete: Transaction?
 
     // UserDefaults-backed settings are not @Observable, so mirror them in
     // local state (loaded in onAppear, written through on mutation) to keep
@@ -34,7 +36,6 @@ struct HomeView: View {
     @State private var currencyCode = "USD"
     @State private var activeTripId: String?
     @State private var quickActions: [QuickAction] = []
-    @State private var budgetLimits: [String: Double] = [:]
 
     /// Vertical gap between the major sections of the dashboard.
     private let sectionSpacing: CGFloat = 28
@@ -62,20 +63,18 @@ struct HomeView: View {
                     recentSection
                 }
                 .padding(.top, AppTheme.Spacing.md)
+                .padding(.bottom, AppTheme.Spacing.sm)
             }
             .background(AppTheme.Colors.background)
             .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .bottom) {
-                // Clears the floating + button (56pt) and the tab bar.
-                Color.clear.frame(height: 100)
-            }
+            .tabShellBottomInset()
             .sheet(item: $editingTransaction) { tx in
                 AddTransactionView(editing: tx)
             }
-            .sheet(isPresented: $showingSettings) {
+            .sheet(isPresented: $showingSettings, onDismiss: loadSettings) {
                 SettingsView()
             }
-            .sheet(isPresented: $showingBudgetManager) {
+            .sheet(isPresented: $showingBudgetManager, onDismiss: loadSettings) {
                 BudgetManagerView()
             }
             .sheet(isPresented: $showingSearch) {
@@ -83,6 +82,22 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingAllTransactions) {
                 AllTransactionsView()
+            }
+            .sheet(isPresented: $showingWalletManager) {
+                WalletManagerView()
+            }
+            .confirmationDialog(
+                "Delete this transaction?",
+                isPresented: Binding(
+                    get: { pendingDelete != nil },
+                    set: { if !$0 { pendingDelete = nil } }
+                ),
+                presenting: pendingDelete
+            ) { tx in
+                Button("Delete", role: .destructive) { delete(tx) }
+                Button("Cancel", role: .cancel) {}
+            } message: { _ in
+                Text("This can't be undone.")
             }
             .onAppear(perform: loadSettings)
         }
@@ -140,6 +155,8 @@ struct HomeView: View {
         Button {
             activeTripId = nil
             store.activeTripId = nil
+            trip.isActive = false
+            try? modelContext.save()
         } label: {
             HStack(spacing: AppTheme.Spacing.sm) {
                 Image(systemName: "airplane")
@@ -260,7 +277,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             sectionHeader("Accounts") {
                 Button("Edit") {
-                    // TODO: Phase 4 — present wallet management sheet.
+                    showingWalletManager = true
                 }
                 .font(.appSans(AppTheme.Typography.fontLabel, weight: .medium))
                 .foregroundStyle(AppTheme.Colors.accent)
@@ -284,25 +301,38 @@ struct HomeView: View {
 
     // MARK: - Budgets
 
-    /// An expense category with a monthly limit set, plus its month-to-date spend.
-    private struct BudgetItem: Identifiable {
+    /// One tile in the Home budgets strip — set limits first, unset after (A→Z).
+    private struct BudgetStripItem: Identifiable {
         let category: AppCategory
         let spent: Double
-        let limit: Double
+        let limit: Double?
         var id: String { category.id }
-        var ratio: Double { limit > 0 ? spent / limit : 0 }
     }
 
-    private var budgetItems: [BudgetItem] {
-        categories
+    private var budgetStripItems: [BudgetStripItem] {
+        let expense = categories
             .filter { $0.type == "expense" }
-            .compactMap { category -> BudgetItem? in
-                guard let limit = budgetLimits[category.id], limit > 0 else { return nil }
-                let spent = monthTransactions
-                    .filter { $0.categoryId == category.id && $0.type == "expense" }
-                    .reduce(0) { $0 + $1.amount }
-                return BudgetItem(category: category, spent: spent, limit: limit)
+            .sorted { $0.label.localizedCaseInsensitiveCompare($1.label) == .orderedAscending }
+
+        func monthSpent(for categoryId: String) -> Double {
+            monthTransactions
+                .filter { $0.categoryId == categoryId && $0.type == "expense" }
+                .reduce(0) { $0 + $1.amount }
+        }
+
+        var withLimit: [BudgetStripItem] = []
+        var withoutLimit: [BudgetStripItem] = []
+
+        for category in expense {
+            let spent = monthSpent(for: category.id)
+            if let limit = store.budgetLimits[category.id], limit > 0 {
+                withLimit.append(BudgetStripItem(category: category, spent: spent, limit: limit))
+            } else {
+                withoutLimit.append(BudgetStripItem(category: category, spent: spent, limit: nil))
             }
+        }
+
+        return withLimit + withoutLimit
     }
 
     private var budgetSection: some View {
@@ -314,12 +344,11 @@ struct HomeView: View {
                 .font(.appSans(AppTheme.Typography.fontLabel, weight: .medium))
                 .foregroundStyle(AppTheme.Colors.accent)
             }
+            .padding(.horizontal, edgePadding)
 
-            if budgetItems.isEmpty {
-                budgetEmptyState
-            } else {
-                LazyVGrid(columns: budgetColumns, spacing: 12) {
-                    ForEach(Array(budgetItems.enumerated()), id: \.element.id) { index, item in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(Array(budgetStripItems.enumerated()), id: \.element.id) { index, item in
                         BudgetCard(
                             category: item.category,
                             spent: item.spent,
@@ -328,22 +357,9 @@ struct HomeView: View {
                         )
                     }
                 }
+                .padding(.horizontal, edgePadding)
             }
         }
-        .padding(.horizontal, edgePadding)
-    }
-
-    private var budgetColumns: [GridItem] {
-        [GridItem(.flexible(), spacing: 12),
-         GridItem(.flexible(), spacing: 12)]
-    }
-
-    private var budgetEmptyState: some View {
-        Text("Tap Manage to set spending limits")
-            .font(.appSans(AppTheme.Typography.fontLabel, weight: .medium))
-            .foregroundStyle(AppTheme.Colors.textMuted)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, AppTheme.Spacing.md)
     }
 
     // MARK: - Quick Add
@@ -411,34 +427,35 @@ struct HomeView: View {
             if recentGroups.isEmpty {
                 emptyState
             } else {
-                VStack(spacing: AppTheme.Spacing.md) {
+                List {
                     ForEach(recentGroups) { group in
-                        dayGroup(group)
+                        Section {
+                            ForEach(group.transactions) { tx in
+                                recentRow(tx)
+                            }
+                        } header: {
+                            Text(group.label)
+                                .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
+                                .foregroundStyle(AppTheme.Colors.textPrimary)
+                                .textCase(nil)
+                        }
                     }
                 }
+                .listStyle(.plain)
+                .scrollDisabled(true)
+                .scrollContentBackground(.hidden)
+                .frame(height: recentListHeight)
             }
         }
         .padding(.horizontal, edgePadding)
     }
 
-    private func dayGroup(_ group: DayGroup) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(group.label)
-                .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
-                .foregroundStyle(AppTheme.Colors.textPrimary)
-                .padding(.bottom, AppTheme.Spacing.sm)
-
-            VStack(spacing: 0) {
-                ForEach(Array(group.transactions.enumerated()), id: \.element.id) { index, tx in
-                    recentRow(tx)
-                    if index < group.transactions.count - 1 {
-                        Divider()
-                            .overlay(AppTheme.Colors.border)
-                    }
-                }
-            }
-            .cardStyle(padding: 0)
-        }
+    /// Approximate height for the non-scrolling recent-transactions list.
+    private var recentListHeight: CGFloat {
+        let rowHeight: CGFloat = 72
+        let headerHeight: CGFloat = 28
+        let count = recentGroups.reduce(0) { $0 + $1.transactions.count }
+        return CGFloat(count) * rowHeight + CGFloat(recentGroups.count) * headerHeight
     }
 
     private func recentRow(_ tx: Transaction) -> some View {
@@ -461,7 +478,13 @@ struct HomeView: View {
             .disabled(quickActions.count >= 6)
             .opacity(quickActions.count >= 6 ? 0.3 : 1)
         }
-        .padding(14)
+        .listRowBackground(AppTheme.Colors.surface)
+        .listRowInsets(EdgeInsets(top: 6, leading: 14, bottom: 6, trailing: 14))
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) { pendingDelete = tx } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
 
     private var emptyState: some View {
@@ -501,7 +524,6 @@ struct HomeView: View {
         currencyCode = store.currencyCode
         activeTripId = store.activeTripId
         quickActions = store.quickActions
-        budgetLimits = store.budgetLimits
     }
 
     private func cycleCurrency() {
@@ -513,8 +535,10 @@ struct HomeView: View {
     }
 
     private func delete(_ tx: Transaction) {
-        modelContext.delete(tx)
-        try? modelContext.save()
+        withAnimation {
+            modelContext.delete(tx)
+            try? modelContext.save()
+        }
     }
 
     private func saveAsQuickAction(_ tx: Transaction) {

@@ -137,6 +137,20 @@ enum AppTheme {
         static let lg: CGFloat = 24
     }
 
+    /// Layout constants for the custom tab shell + floating add button overlay.
+    enum Layout {
+        /// Tab bar content height (see CustomTabBar).
+        static let tabBarHeight: CGFloat = 56
+        /// FAB diameter (see FloatingAddButton).
+        static let floatingActionSize: CGFloat = 56
+        /// Distance from screen bottom to FAB bottom edge (MainTabView).
+        static let floatingActionBottomOffset: CGFloat = 90
+        /// Bottom scroll inset when the FAB is visible (FAB top + breathing room).
+        static let tabShellBottomInset: CGFloat = floatingActionBottomOffset + floatingActionSize + 20
+        /// Bottom scroll inset on Plans tab (no FAB).
+        static let tabBarBottomInset: CGFloat = tabBarHeight + 24
+    }
+
     // MARK: Typography Scale
     // All SF Pro. Hierarchy comes from weight + size contrast, not serif.
     enum Typography {
@@ -189,6 +203,18 @@ struct CardStyle: ViewModifier {
 }
 
 extension View {
+    /// Reserves space at the bottom of scroll content for the custom tab bar and,
+    /// on tabs that show it, the floating + button.
+    func tabShellBottomInset(showsFloatingAction: Bool = true) -> some View {
+        safeAreaInset(edge: .bottom) {
+            Color.clear.frame(
+                height: showsFloatingAction
+                    ? AppTheme.Layout.tabShellBottomInset
+                    : AppTheme.Layout.tabBarBottomInset
+            )
+        }
+    }
+
     /// Wraps content in the white surface card (background, radius, soft shadow).
     /// Pass `padding: 0` when child rows already control their own insets.
     func cardStyle(padding: CGFloat = AppTheme.Spacing.md) -> some View {

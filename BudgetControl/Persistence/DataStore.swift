@@ -77,10 +77,10 @@ final class DataStore {
         set { UserDefaults.standard.set(newValue, forKey: Keys.activeTripId) }
     }
 
-    /// Per-category monthly budget limits, keyed by `categoryId`. Set in Stats.
-    var budgetLimits: [String: Double] {
-        get { UserDefaults.standard.dictionary(forKey: Keys.budgetLimits) as? [String: Double] ?? [:] }
-        set { UserDefaults.standard.set(newValue, forKey: Keys.budgetLimits) }
+    /// Per-category monthly budget limits, keyed by `categoryId`. Stored (not
+    /// computed) so @Observable tracks changes and Home/Stats refresh live.
+    var budgetLimits: [String: Double] = DataStore.readBudgetLimits() {
+        didSet { UserDefaults.standard.set(budgetLimits, forKey: Keys.budgetLimits) }
     }
 
     /// Saved quick-add shortcuts (max 6). Stored as JSON.
@@ -234,6 +234,18 @@ final class DataStore {
         // to their lastRun at least once, so subsequent launches resume from the
         // advanced lastRun values rather than re-scanning historical intervals.
         UserDefaults.standard.set(true, forKey: Keys.recurringProcessorV1)
+    }
+
+    // MARK: - UserDefaults Helpers
+
+    /// Reads budget limits from UserDefaults, coercing NSNumber values to Double.
+    private static func readBudgetLimits() -> [String: Double] {
+        guard let dict = UserDefaults.standard.dictionary(forKey: Keys.budgetLimits) else { return [:] }
+        return dict.compactMapValues { value in
+            if let number = value as? NSNumber { return number.doubleValue }
+            if let double = value as? Double { return double }
+            return nil
+        }
     }
 
     // MARK: - Formatting

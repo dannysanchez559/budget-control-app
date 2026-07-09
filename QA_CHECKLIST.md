@@ -13,21 +13,21 @@ Manual on-device testing checklist before TestFlight. Based on the **implemented
 
 ## Setup
 
-- [ ] Connect a physical iPhone (not Simulator) via USB or Wi-Fi debugging
-- [ ] Open `BudgetControl.xcodeproj` in Xcode
-- [ ] Select the **BudgetControl** scheme and the connected device as the run destination
-- [ ] In **Signing & Capabilities**, confirm a valid Team is selected and provisioning succeeds (no signing errors)
-- [ ] Product → **Run** (⌘R) — app installs and launches on the device
-- [ ] Confirm the installed app name is **Budget Control** on the home screen
-- [ ] Record device model and iOS version in the header above (e.g. iPhone 15 Pro, iOS 17.4)
-- [ ] For a clean first-launch test: delete the app from the device, then reinstall via Xcode
-- [ ] For regression testing: keep an existing install and verify data persists across relaunch
+- [x] Connect a physical iPhone (not Simulator) via USB or Wi-Fi debugging
+- [x] Open `BudgetControl.xcodeproj` in Xcode
+- [x ] Select the **BudgetControl** scheme and the connected device as the run destination
+- [x ] In **Signing & Capabilities**, confirm a valid Team is selected and provisioning succeeds (no signing errors)
+- [ x] Product → **Run** (⌘R) — app installs and launches on the device
+- [ x] Confirm the installed app name is **Budget Control** on the home screen
+- [ x] Record device model and iOS version in the header above (e.g. iPhone 15 Pro, iOS 17.4)
+- [ x] For a clean first-launch test: delete the app from the device, then reinstall via Xcode
+- [ x] For regression testing: keep an existing install and verify data persists across relaunch
 
 ---
 
 ## Onboarding
 
-- [ ] On first launch (fresh install), the 4-screen onboarding pager appears before the main tab shell
+- [ x] On first launch (fresh install), the 4-screen onboarding pager appears before the main tab shell
 - [ ] **Screen 1** — “Take control of your money”: SF Symbol icon badge (`target`), title, body text, dot indicator, **Continue** button; **Skip** is hidden/disabled
 - [ ] **Screen 2** — “All your wallets in one place”: displays correctly; **Skip** is visible and tappable
 - [ ] **Screen 3** — “Built for life on the go”: displays correctly; **Skip** works

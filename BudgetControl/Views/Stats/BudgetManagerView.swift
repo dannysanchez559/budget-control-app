@@ -20,6 +20,7 @@ struct BudgetManagerView: View {
     // Editable text mirror of the limits, keyed by categoryId. Empty/zero
     // entries are dropped when written back on dismiss.
     @State private var limitText: [String: String] = [:]
+    @FocusState private var focusedCategoryId: String?
 
     private var expenseCategories: [AppCategory] {
         categories.filter { $0.type == "expense" }.sorted { $0.label < $1.label }
@@ -66,7 +67,7 @@ struct BudgetManagerView: View {
 
         return HStack(spacing: AppTheme.Spacing.sm) {
             IconBadge(
-                symbol: IconMap.symbol(forCategory: category.id),
+                symbol: IconMap.symbol(forCategory: category.id, storedIcon: category.emoji),
                 style: IconMap.pastel(forCategory: category.id),
                 size: 28
             )
@@ -82,6 +83,7 @@ struct BudgetManagerView: View {
                 .font(.appSans(AppTheme.Typography.fontCardNumber, weight: .semibold))
                 .foregroundStyle(AppTheme.Colors.textPrimary)
                 .frame(maxWidth: 100)
+                .focused($focusedCategoryId, equals: category.id)
 
             Button {
                 limitText[category.id] = ""
@@ -92,6 +94,10 @@ struct BudgetManagerView: View {
             }
             .buttonStyle(.plain)
             .disabled(!hasValue)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            focusedCategoryId = category.id
         }
     }
 

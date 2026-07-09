@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01DAF3B650882A9AA57948B8 /* WalletManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A5BC9BC679095995E99E6 /* WalletManagerView.swift */; };
 		05076B74CBD95A22BDE29923 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44903CD83B328C8B9A7FEDD4 /* HapticManager.swift */; };
 		089B9BCA8D3DF62B4B880CB3 /* PlansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB75D7ED5EBBCE00DE71A6C /* PlansView.swift */; };
 		0B047B18B50264C87FB46BDC /* BudgetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918DF3C63DA15BF01587D3DD /* BudgetCard.swift */; };
@@ -21,6 +22,7 @@
 		3AC2CD071E55C356E1DAC8F6 /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B235ECD1E9A8A4A60C99DCB /* DataStore.swift */; };
 		3D05F28FA902B51B6868EEFC /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A754215419B62BB28AABDBEC /* CustomTabBar.swift */; };
 		4906658403659DB8A97BDB5E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 092BDD97CD31685FE738C53B /* HomeView.swift */; };
+		4B9E91D0684BE00C3CCB8664 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90AA151A844AD527F1DEF00A /* AddCategoryView.swift */; };
 		57E247239065D9CD0C8593BD /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742CBC51ED2AB7CA7F1760BD /* Trip.swift */; };
 		5B33672396EAE4541097D2AD /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C13456A951D5C26D4A421B1 /* AccountCard.swift */; };
 		5BCC474C503FBD59730420B2 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA4E95BF6FF762F9013328 /* PrimaryButton.swift */; };
@@ -70,10 +72,12 @@
 		79D70AF7C3F1F6ACED013BE7 /* IconMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconMap.swift; sourceTree = "<group>"; };
 		89FA4E95BF6FF762F9013328 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		902EA630DE7DFD2A21528E0C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		90AA151A844AD527F1DEF00A /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
 		918DF3C63DA15BF01587D3DD /* BudgetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetCard.swift; sourceTree = "<group>"; };
 		A07B38236381258F10233B9E /* FloatingAddButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingAddButton.swift; sourceTree = "<group>"; };
 		A28C15479F9E2EE46F67F984 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		A754215419B62BB28AABDBEC /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
+		AB3A5BC9BC679095995E99E6 /* WalletManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletManagerView.swift; sourceTree = "<group>"; };
 		AE5389C9408051302D79E3D8 /* BudgetControlApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetControlApp.swift; sourceTree = "<group>"; };
 		B6E5BEBCC5C1D3B2EB6C3101 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		C62276F643DE4FD5924B8B8E /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
@@ -184,6 +188,7 @@
 		9555B57416B6EBD44BD8233C /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
+				90AA151A844AD527F1DEF00A /* AddCategoryView.swift */,
 				F6C11D99CACFE5B85DF13464 /* AddTransactionView.swift */,
 			);
 			path = Transactions;
@@ -217,6 +222,7 @@
 			children = (
 				4D8E229BF9D6F7F186E7ED42 /* CurrencyPickerView.swift */,
 				3F8D7ACD37A6C27BE34E26B7 /* SettingsView.swift */,
+				AB3A5BC9BC679095995E99E6 /* WalletManagerView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -328,6 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B33672396EAE4541097D2AD /* AccountCard.swift in Sources */,
+				4B9E91D0684BE00C3CCB8664 /* AddCategoryView.swift in Sources */,
 				5EE347E269142C27DD401D03 /* AddTransactionView.swift in Sources */,
 				3017161643680E85CA73A62A /* AllTransactionsView.swift in Sources */,
 				D13747179AD8D6FA6E5E46F4 /* AppCategory.swift in Sources */,
@@ -363,6 +370,7 @@
 				9036EB163B06B74D45095A5D /* TransactionRowView.swift in Sources */,
 				57E247239065D9CD0C8593BD /* Trip.swift in Sources */,
 				280F949B95B0402DEA9B263F /* Wallet.swift in Sources */,
+				01DAF3B650882A9AA57948B8 /* WalletManagerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
