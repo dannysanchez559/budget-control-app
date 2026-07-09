@@ -56,9 +56,8 @@ final class DataStore {
         static let recurringProcessorV1 = "recurringProcessorV1"
     }
 
-    var currencyCode: String {
-        get { UserDefaults.standard.string(forKey: Keys.currencyCode) ?? "USD" }
-        set { UserDefaults.standard.set(newValue, forKey: Keys.currencyCode) }
+    var currencyCode: String = UserDefaults.standard.string(forKey: Keys.currencyCode) ?? "USD" {
+        didSet { UserDefaults.standard.set(currencyCode, forKey: Keys.currencyCode) }
     }
 
     // Stored (not computed) so @Observable tracks it and the toggle updates the
@@ -72,9 +71,8 @@ final class DataStore {
         set { UserDefaults.standard.set(newValue, forKey: Keys.hasOnboarded) }
     }
 
-    var activeTripId: String? {
-        get { UserDefaults.standard.string(forKey: Keys.activeTripId) }
-        set { UserDefaults.standard.set(newValue, forKey: Keys.activeTripId) }
+    var activeTripId: String? = UserDefaults.standard.string(forKey: Keys.activeTripId) {
+        didSet { UserDefaults.standard.set(activeTripId, forKey: Keys.activeTripId) }
     }
 
     /// Per-category monthly budget limits, keyed by `categoryId`. Stored (not
@@ -83,16 +81,11 @@ final class DataStore {
         didSet { UserDefaults.standard.set(budgetLimits, forKey: Keys.budgetLimits) }
     }
 
-    /// Saved quick-add shortcuts (max 6). Stored as JSON.
-    var quickActions: [QuickAction] {
-        get {
-            guard let data = UserDefaults.standard.data(forKey: Keys.quickActions),
-                  let decoded = try? JSONDecoder().decode([QuickAction].self, from: data)
-            else { return [] }
-            return decoded
-        }
-        set {
-            let capped = Array(newValue.prefix(6))
+    /// Saved quick-add shortcuts (max 6). Stored so backup/restore and UI stay in sync.
+    var quickActions: [QuickAction] = DataStore.readQuickActions() {
+        didSet {
+            let capped = Array(quickActions.prefix(6))
+            if capped.count != quickActions.count { quickActions = capped; return }
             if let data = try? JSONEncoder().encode(capped) {
                 UserDefaults.standard.set(data, forKey: Keys.quickActions)
             }
@@ -188,6 +181,7 @@ final class DataStore {
         let now = Date.now
         let calendar = Calendar.current
         let code = currencyCode
+        let existing = (try? context.fetch(FetchDescriptor<Transaction>())) ?? []
 
         for rule in rules {
             // Map the rule's frequency to a calendar component to step by.
@@ -207,6 +201,16 @@ final class DataStore {
                   intervalDate <= now {
                 // Only generate for intervals not already covered by lastRun.
                 if intervalDate > rule.lastRun {
+                    let isDuplicate = existing.contains { tx in
+                        tx.fromRecurringId == rule.id
+                            && calendar.isDate(tx.date, inSameDayAs: intervalDate)
+                    }
+                    guard !isDuplicate else {
+                        mostRecentProcessed = intervalDate
+                        n += 1
+                        continue
+                    }
+
                     let transaction = Transaction(
                         type: rule.type,
                         amount: rule.amount,
@@ -246,6 +250,14 @@ final class DataStore {
             if let double = value as? Double { return double }
             return nil
         }
+    }
+
+    /// Reads quick actions from UserDefaults JSON.
+    private static func readQuickActions() -> [QuickAction] {
+        guard let data = UserDefaults.standard.data(forKey: Keys.quickActions),
+              let decoded = try? JSONDecoder().decode([QuickAction].self, from: data)
+        else { return [] }
+        return Array(decoded.prefix(6))
     }
 
     // MARK: - Formatting

@@ -12,9 +12,10 @@ import SwiftData
 struct ContentView: View {
     @Environment(DataStore.self) private var store
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
 
-    // Local mirror so the view re-renders when onboarding state flips.
-    @State private var hasOnboarded = false
+    // Seed synchronously so returning users never flash the onboarding pager.
+    @State private var hasOnboarded = UserDefaults.standard.bool(forKey: "hasOnboarded")
 
     var body: some View {
         Group {
@@ -30,6 +31,11 @@ struct ContentView: View {
             store.seedIfNeeded(context: modelContext)
             store.processRecurringRules(context: modelContext)
             hasOnboarded = store.hasOnboarded
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                store.processRecurringRules(context: modelContext)
+            }
         }
     }
 

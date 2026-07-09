@@ -38,7 +38,7 @@ struct WalletManagerView: View {
                         .buttonStyle(.plain)
                     }
                 } footer: {
-                    Text("Tap a wallet to edit its name and icon. Default wallets cannot be deleted.")
+                    Text("Tap a wallet to edit its name and icon. Wallets with transactions cannot be deleted.")
                         .font(.appSans(AppTheme.Typography.fontLabel))
                         .foregroundStyle(AppTheme.Colors.textMuted)
                 }
@@ -76,12 +76,15 @@ struct WalletManagerView: View {
                 isPresented: deleteBinding,
                 presenting: pendingDelete
             ) { wallet in
-                Button("Delete", role: .destructive) { delete(wallet) }
+                let count = transactions.filter { $0.walletId == wallet.id }.count
+                if count == 0 {
+                    Button("Delete", role: .destructive) { delete(wallet) }
+                }
                 Button("Cancel", role: .cancel) {}
             } message: { wallet in
                 let count = transactions.filter { $0.walletId == wallet.id }.count
                 if count > 0 {
-                    Text("This wallet has \(count) transaction\(count == 1 ? "" : "s"). Historical records will keep the wallet reference.")
+                    Text("This wallet has \(count) transaction\(count == 1 ? "" : "s"). Delete or reassign them before removing this wallet.")
                 } else {
                     Text("This can't be undone.")
                 }
@@ -113,6 +116,7 @@ struct WalletManagerView: View {
 
     private func delete(_ wallet: Wallet) {
         guard !wallet.isDefault else { return }
+        guard transactions.filter({ $0.walletId == wallet.id }).isEmpty else { return }
         modelContext.delete(wallet)
         try? modelContext.save()
         pendingDelete = nil
@@ -125,6 +129,8 @@ struct WalletManagerView: View {
 private struct WalletFormView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+
+    @Query private var transactions: [Transaction]
 
     var wallet: Wallet?
     var onDelete: (() -> Void)?
@@ -140,6 +146,15 @@ private struct WalletFormView: View {
 
     private var isNew: Bool { wallet == nil }
     private var canSave: Bool { !name.trimmingCharacters(in: .whitespaces).isEmpty }
+
+    private var linkedTransactionCount: Int {
+        guard let wallet else { return 0 }
+        return transactions.filter { $0.walletId == wallet.id }.count
+    }
+
+    private var canDelete: Bool {
+        !isNew && wallet?.isDefault == false && linkedTransactionCount == 0
+    }
 
     var body: some View {
         NavigationStack {
@@ -162,7 +177,7 @@ private struct WalletFormView: View {
 
                         iconPicker
 
-                        if !isNew, wallet?.isDefault == false, onDelete != nil {
+                        if canDelete, onDelete != nil {
                             Button(role: .destructive, action: { onDelete?() }) {
                                 Text("Delete Wallet")
                                     .font(.appSans(15, weight: .semibold))
@@ -170,6 +185,12 @@ private struct WalletFormView: View {
                             }
                             .buttonStyle(.plain)
                             .padding(.top, AppTheme.Spacing.sm)
+                        } else if !isNew, linkedTransactionCount > 0 {
+                            Text("This wallet has \(linkedTransactionCount) transaction\(linkedTransactionCount == 1 ? "" : "s") and can't be deleted.")
+                                .font(.appSans(AppTheme.Typography.fontLabel))
+                                .foregroundStyle(AppTheme.Colors.textMuted)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, AppTheme.Spacing.sm)
                         }
                     }
                     .padding(AppTheme.Spacing.md)

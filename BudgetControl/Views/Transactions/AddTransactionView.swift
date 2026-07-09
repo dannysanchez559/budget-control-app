@@ -379,7 +379,6 @@ struct AddTransactionView: View {
             tx.date = date
             tx.note = note
             tx.tags = parsedTags()
-            tx.currencyCode = store.currencyCode
             tx.tripId = tripId
         } else {
             let tx = Transaction(

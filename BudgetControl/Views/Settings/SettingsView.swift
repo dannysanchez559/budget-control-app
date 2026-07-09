@@ -76,7 +76,9 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { pendingBackup = nil }
                 Button("Replace", role: .destructive) { performRestore() }
             } message: {
-                Text("Restoring this backup will permanently delete all current transactions, wallets, categories, and plans, then replace them with the backup contents.")
+                if let pendingBackup {
+                    Text(BackupRestore.summary(for: pendingBackup))
+                }
             }
             .alert("Restore", isPresented: $showingResultAlert) {
                 Button("OK", role: .cancel) {}
@@ -84,6 +86,7 @@ struct SettingsView: View {
                 Text(resultMessage ?? "")
             }
             .onAppear(perform: regenerateExports)
+            .onChange(of: transactions.count) { _, _ in regenerateExports() }
         }
     }
 
@@ -271,7 +274,14 @@ struct SettingsView: View {
             trips: trips.map(CodableTrip.init),
             goals: goals.map(CodableGoal.init),
             subscriptions: subscriptions.map(CodableSubscription.init),
-            recurringRules: recurringRules.map(CodableRecurringRule.init)
+            recurringRules: recurringRules.map(CodableRecurringRule.init),
+            settings: BackupSettings(
+                currencyCode: store.currencyCode,
+                isDarkMode: store.isDarkMode,
+                activeTripId: store.activeTripId,
+                budgetLimits: store.budgetLimits,
+                quickActions: store.quickActions
+            )
         )
 
         let encoder = JSONEncoder()
@@ -300,12 +310,11 @@ struct SettingsView: View {
             defer { if needsAccess { url.stopAccessingSecurityScopedResource() } }
             do {
                 let data = try Data(contentsOf: url)
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601
-                pendingBackup = try decoder.decode(BackupBundle.self, from: data)
+                pendingBackup = try BackupRestore.decodeBackup(from: data)
                 showingRestoreConfirm = true
             } catch {
-                resultMessage = "This file is not a valid Budget Control backup."
+                resultMessage = (error as? LocalizedError)?.errorDescription
+                    ?? "This file is not a valid Budget Control backup."
                 showingResultAlert = true
             }
         }
@@ -316,35 +325,58 @@ struct SettingsView: View {
         defer { pendingBackup = nil }
 
         do {
-            // Wipe every existing record.
-            try modelContext.delete(model: Transaction.self)
-            try modelContext.delete(model: Wallet.self)
-            try modelContext.delete(model: AppCategory.self)
-            try modelContext.delete(model: Trip.self)
-            try modelContext.delete(model: SavingsGoal.self)
-            try modelContext.delete(model: Subscription.self)
-            try modelContext.delete(model: RecurringRule.self)
+            try BackupRestore.apply(backup, context: modelContext)
 
-            // Re-insert everything from the backup.
-            backup.wallets.forEach { modelContext.insert($0.toModel()) }
-            backup.categories.forEach { modelContext.insert($0.toModel()) }
-            backup.trips.forEach { modelContext.insert($0.toModel()) }
-            backup.goals.forEach { modelContext.insert($0.toModel()) }
-            backup.subscriptions.forEach { modelContext.insert($0.toModel()) }
-            backup.recurringRules.forEach { modelContext.insert($0.toModel()) }
-            backup.transactions.forEach { modelContext.insert($0.toModel()) }
+            if let settings = backup.settings {
+                applyRestoredSettings(settings)
+            } else {
+                // Legacy backups — derive the active trip from restored SwiftData flags.
+                let activeTrip = (try? modelContext.fetch(FetchDescriptor<Trip>()))?.first { $0.isActive }
+                store.activeTripId = activeTrip?.id
+                syncTripActiveFlags(activeId: activeTrip?.id)
+            }
 
-            try modelContext.save()
             regenerateExports()
-            resultMessage = "Your data was restored successfully."
+            let count = backup.transactions.count
+            resultMessage = count > 0
+                ? "Restored \(count) transaction\(count == 1 ? "" : "s") and all other backup data."
+                : "Restore completed, but this backup contains no transactions."
         } catch {
-            resultMessage = "Restore failed: \(error.localizedDescription)"
+            resultMessage = (error as? LocalizedError)?.errorDescription
+                ?? "Restore failed: \(error.localizedDescription)"
         }
         showingResultAlert = true
+    }
+
+    private func applyRestoredSettings(_ settings: BackupSettings) {
+        store.currencyCode = settings.currencyCode ?? store.currencyCode
+        store.isDarkMode = settings.isDarkMode ?? store.isDarkMode
+        store.budgetLimits = settings.budgetLimits ?? [:]
+        store.quickActions = settings.quickActions ?? []
+        store.activeTripId = settings.activeTripId
+        syncTripActiveFlags(activeId: settings.activeTripId)
+    }
+
+    /// Aligns `Trip.isActive` with the restored `activeTripId` preference.
+    private func syncTripActiveFlags(activeId: String?) {
+        let allTrips = (try? modelContext.fetch(FetchDescriptor<Trip>())) ?? []
+        for trip in allTrips {
+            trip.isActive = (trip.id == activeId)
+        }
+        try? modelContext.save()
     }
 }
 
 // MARK: - Backup Codable Mirrors
+
+/// UserDefaults settings included in JSON backup/restore.
+struct BackupSettings: Codable {
+    var currencyCode: String?
+    var isDarkMode: Bool?
+    var activeTripId: String?
+    var budgetLimits: [String: Double]?
+    var quickActions: [QuickAction]?
+}
 
 /// Single Codable container holding every model array for JSON backup/restore.
 struct BackupBundle: Codable {
@@ -355,6 +387,8 @@ struct BackupBundle: Codable {
     var goals: [CodableGoal]
     var subscriptions: [CodableSubscription]
     var recurringRules: [CodableRecurringRule]
+    /// App preferences. Omitted in backups created before this field existed.
+    var settings: BackupSettings?
 }
 
 struct CodableTransaction: Codable {
@@ -370,10 +404,46 @@ struct CodableTransaction: Codable {
     var date: Date
     var fromRecurringId: String?
 
+    init(
+        id: UUID,
+        type: String,
+        amount: Double,
+        currencyCode: String,
+        categoryId: String,
+        walletId: String,
+        note: String,
+        tags: [String],
+        tripId: String?,
+        date: Date,
+        fromRecurringId: String?
+    ) {
+        self.id = id
+        self.type = type
+        self.amount = amount
+        self.currencyCode = currencyCode
+        self.categoryId = categoryId
+        self.walletId = walletId
+        self.note = note
+        self.tags = tags
+        self.tripId = tripId
+        self.date = date
+        self.fromRecurringId = fromRecurringId
+    }
+
     init(_ m: Transaction) {
-        id = m.id; type = m.type; amount = m.amount; currencyCode = m.currencyCode
-        categoryId = m.categoryId; walletId = m.walletId; note = m.note; tags = m.tags
-        tripId = m.tripId; date = m.date; fromRecurringId = m.fromRecurringId
+        self.init(
+            id: m.id,
+            type: m.type,
+            amount: m.amount,
+            currencyCode: m.currencyCode,
+            categoryId: m.categoryId,
+            walletId: m.walletId,
+            note: m.note,
+            tags: m.tags,
+            tripId: m.tripId,
+            date: m.date,
+            fromRecurringId: m.fromRecurringId
+        )
     }
 
     func toModel() -> Transaction {
@@ -385,30 +455,45 @@ struct CodableTransaction: Codable {
 
 struct CodableWallet: Codable {
     var id: String, name: String, emoji: String, colorHex: String, isDefault: Bool
+    init(id: String, name: String, emoji: String, colorHex: String, isDefault: Bool) {
+        self.id = id; self.name = name; self.emoji = emoji; self.colorHex = colorHex; self.isDefault = isDefault
+    }
     init(_ m: Wallet) { id = m.id; name = m.name; emoji = m.emoji; colorHex = m.colorHex; isDefault = m.isDefault }
     func toModel() -> Wallet { Wallet(id: id, name: name, emoji: emoji, colorHex: colorHex, isDefault: isDefault) }
 }
 
 struct CodableCategory: Codable {
     var id: String, label: String, emoji: String, colorHex: String, type: String, isDefault: Bool
+    init(id: String, label: String, emoji: String, colorHex: String, type: String, isDefault: Bool) {
+        self.id = id; self.label = label; self.emoji = emoji; self.colorHex = colorHex; self.type = type; self.isDefault = isDefault
+    }
     init(_ m: AppCategory) { id = m.id; label = m.label; emoji = m.emoji; colorHex = m.colorHex; type = m.type; isDefault = m.isDefault }
     func toModel() -> AppCategory { AppCategory(id: id, label: label, emoji: emoji, colorHex: colorHex, type: type, isDefault: isDefault) }
 }
 
 struct CodableTrip: Codable {
     var id: String, name: String, budget: Double, isActive: Bool
+    init(id: String, name: String, budget: Double, isActive: Bool) {
+        self.id = id; self.name = name; self.budget = budget; self.isActive = isActive
+    }
     init(_ m: Trip) { id = m.id; name = m.name; budget = m.budget; isActive = m.isActive }
     func toModel() -> Trip { Trip(id: id, name: name, budget: budget, isActive: isActive) }
 }
 
 struct CodableGoal: Codable {
     var id: String, name: String, target: Double, saved: Double, emoji: String
+    init(id: String, name: String, target: Double, saved: Double, emoji: String) {
+        self.id = id; self.name = name; self.target = target; self.saved = saved; self.emoji = emoji
+    }
     init(_ m: SavingsGoal) { id = m.id; name = m.name; target = m.target; saved = m.saved; emoji = m.emoji }
     func toModel() -> SavingsGoal { SavingsGoal(id: id, name: name, target: target, saved: saved, emoji: emoji) }
 }
 
 struct CodableSubscription: Codable {
     var id: String, name: String, amount: Double, period: String, emoji: String
+    init(id: String, name: String, amount: Double, period: String, emoji: String) {
+        self.id = id; self.name = name; self.amount = amount; self.period = period; self.emoji = emoji
+    }
     init(_ m: Subscription) { id = m.id; name = m.name; amount = m.amount; period = m.period; emoji = m.emoji }
     func toModel() -> Subscription { Subscription(id: id, name: name, amount: amount, period: period, emoji: emoji) }
 }
@@ -416,6 +501,13 @@ struct CodableSubscription: Codable {
 struct CodableRecurringRule: Codable {
     var id: String, type: String, amount: Double, categoryId: String, walletId: String
     var note: String, frequency: String, startDate: Date, lastRun: Date
+    init(
+        id: String, type: String, amount: Double, categoryId: String, walletId: String,
+        note: String, frequency: String, startDate: Date, lastRun: Date
+    ) {
+        self.id = id; self.type = type; self.amount = amount; self.categoryId = categoryId; self.walletId = walletId
+        self.note = note; self.frequency = frequency; self.startDate = startDate; self.lastRun = lastRun
+    }
     init(_ m: RecurringRule) {
         id = m.id; type = m.type; amount = m.amount; categoryId = m.categoryId; walletId = m.walletId
         note = m.note; frequency = m.frequency; startDate = m.startDate; lastRun = m.lastRun

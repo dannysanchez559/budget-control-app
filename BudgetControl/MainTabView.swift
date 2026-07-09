@@ -23,10 +23,12 @@ struct MainTabView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Active destination — each screen already provides its own
-            // NavigationStack, so no extra wrapping is needed here.
-            destinationView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // Keep every tab mounted so scroll position and month selection persist.
+            tabLayer(0) { HomeView() }
+            tabLayer(1) { StatsView() }
+            tabLayer(2) { CalendarView(selectedDate: $calendarSelectedDate) }
+            tabLayer(3) { PlansView() }
+            tabLayer(4) { AllTransactionsView() }
 
             // Floating add button — hidden on the Plans tab (index 3).
             if selectedTab != 3 {
@@ -57,24 +59,12 @@ struct MainTabView: View {
     }
 
     @ViewBuilder
-    private var destinationView: some View {
-        switch selectedTab {
-        case 0:
-            HomeView()
-                .toolbar(.hidden, for: .tabBar)
-        case 1:
-            StatsView()
-                .toolbar(.hidden, for: .tabBar)
-        case 2:
-            CalendarView(selectedDate: $calendarSelectedDate)
-                .toolbar(.hidden, for: .tabBar)
-        case 3:
-            PlansView()
-                .toolbar(.hidden, for: .tabBar)
-        default:
-            AllTransactionsView()
-                .toolbar(.hidden, for: .tabBar)
-        }
+    private func tabLayer<T: View>(_ index: Int, @ViewBuilder content: () -> T) -> some View {
+        content()
+            .toolbar(.hidden, for: .tabBar)
+            .opacity(selectedTab == index ? 1 : 0)
+            .allowsHitTesting(selectedTab == index)
+            .accessibilityHidden(selectedTab != index)
     }
 }
 

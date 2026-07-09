@@ -29,6 +29,7 @@
 		5EE347E269142C27DD401D03 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C11D99CACFE5B85DF13464 /* AddTransactionView.swift */; };
 		64BB3A850747952CD0E886E3 /* BudgetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90E9792B83BDAC45EBD3A27 /* BudgetManagerView.swift */; };
 		694520D4AF7E22EF247BB6AF /* RecurringRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C688B2483478B26933E4AF91 /* RecurringRule.swift */; };
+		6CC8C9583BAA300D3172E269 /* BackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56D9EB8196844699FDE314F /* BackupRestore.swift */; };
 		6E22681429E6C11D74744E7F /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20EAC6C0A15D7A07798D4814 /* MainTabView.swift */; };
 		82C2E7433E3D047DB2A8767F /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B21CABB8C15E678901C132E /* AppTheme.swift */; };
 		9036EB163B06B74D45095A5D /* TransactionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357D4B84368ABBF084596D7D /* TransactionRowView.swift */; };
@@ -53,7 +54,7 @@
 		0B70F88CA6AB94E5CB0E5079 /* PastelCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastelCard.swift; sourceTree = "<group>"; };
 		1B21CABB8C15E678901C132E /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		1B235ECD1E9A8A4A60C99DCB /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
-		1D4F51799909DDFD09019747 /* Budget Control.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Budget Control.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D4F51799909DDFD09019747 /* BudgetControl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BudgetControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EAC6C0A15D7A07798D4814 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		2AB75D7ED5EBBCE00DE71A6C /* PlansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansView.swift; sourceTree = "<group>"; };
 		2B159737674855E47C92AE2D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -88,6 +89,7 @@
 		D5B801CCB3DF8E96F2C6B0BE /* TransactionGrouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionGrouping.swift; sourceTree = "<group>"; };
 		DBBE9BD863EBE93D9220B0AE /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		E223B27FBEDE2C90C9EFC674 /* IconBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconBadge.swift; sourceTree = "<group>"; };
+		E56D9EB8196844699FDE314F /* BackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestore.swift; sourceTree = "<group>"; };
 		E5C6D698DD3288F27F496523 /* AllTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllTransactionsView.swift; sourceTree = "<group>"; };
 		F6C11D99CACFE5B85DF13464 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,6 +123,7 @@
 		2A3E88C7E0D92B399539A0B7 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				E56D9EB8196844699FDE314F /* BackupRestore.swift */,
 				D5B801CCB3DF8E96F2C6B0BE /* TransactionGrouping.swift */,
 			);
 			path = Utilities;
@@ -197,7 +200,7 @@
 		A39CC40BAD949FCA79830D4E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D4F51799909DDFD09019747 /* Budget Control.app */,
+				1D4F51799909DDFD09019747 /* BudgetControl.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -286,7 +289,7 @@
 			packageProductDependencies = (
 			);
 			productName = BudgetControl;
-			productReference = 1D4F51799909DDFD09019747 /* Budget Control.app */;
+			productReference = 1D4F51799909DDFD09019747 /* BudgetControl.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -297,6 +300,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 6997F4914D941C8F64ECE168 /* Build configuration list for PBXProject "BudgetControl" */;
 			developmentRegion = en;
@@ -340,6 +345,7 @@
 				D13747179AD8D6FA6E5E46F4 /* AppCategory.swift in Sources */,
 				9513DE457872E7700D29F816 /* AppIconPreview.swift in Sources */,
 				82C2E7433E3D047DB2A8767F /* AppTheme.swift in Sources */,
+				6CC8C9583BAA300D3172E269 /* BackupRestore.swift in Sources */,
 				0B047B18B50264C87FB46BDC /* BudgetCard.swift in Sources */,
 				FBC713FE0CB7BD06115597C6 /* BudgetControlApp.swift in Sources */,
 				64BB3A850747952CD0E886E3 /* BudgetManagerView.swift in Sources */,
@@ -441,7 +447,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = VUSW6ZS972;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -462,7 +467,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = VUSW6ZS972;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
