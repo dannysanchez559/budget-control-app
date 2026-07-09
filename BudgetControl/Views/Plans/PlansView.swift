@@ -158,7 +158,6 @@ private struct PlanSectionCard<Content: View>: View {
                 .padding(.vertical, AppTheme.Spacing.sm)
             content
         }
-        .padding(AppTheme.Spacing.md)
         .cardStyle()
     }
 }
@@ -169,6 +168,7 @@ private extension View {
     func planRow() -> some View {
         self
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, AppTheme.Spacing.sm)
             .padding(.vertical, AppTheme.Spacing.sm)
             .background(AppTheme.Colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.medium, style: .continuous))
@@ -685,7 +685,7 @@ private struct RecurringFormView: View {
     private var amountField: some View {
         VStack(spacing: AppTheme.Spacing.sm) {
             sectionLabel("Amount").frame(maxWidth: .infinity, alignment: .leading)
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.sm) {
                 Text(DataStore.currencyInfo(for: store.currencyCode).symbol)
                     .font(.appSans(30, weight: .medium))
                     .foregroundStyle(AppTheme.Colors.textMuted)
@@ -697,6 +697,7 @@ private struct RecurringFormView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity)
+            .padding(.top, AppTheme.Spacing.xs)
         }
         .cardStyle()
     }

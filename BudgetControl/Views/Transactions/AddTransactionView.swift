@@ -125,7 +125,7 @@ struct AddTransactionView: View {
             sectionLabel("Amount")
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.sm) {
                 Text(DataStore.currencyInfo(for: store.currencyCode).symbol)
                     .font(.appSerif(30, weight: .medium))
                     .foregroundStyle(AppTheme.Colors.textMuted)
@@ -137,6 +137,7 @@ struct AddTransactionView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity)
+            .padding(.top, AppTheme.Spacing.xs)
         }
         .cardStyle()
     }
@@ -216,8 +217,10 @@ struct AddTransactionView: View {
                     .font(.appSans(11))
                     .foregroundStyle(AppTheme.Colors.textPrimary)
                     .lineLimit(1)
+                    .padding(.horizontal, AppTheme.Spacing.xs)
             }
             .frame(maxWidth: .infinity)
+            .padding(.horizontal, AppTheme.Spacing.xs)
             .padding(.vertical, AppTheme.Spacing.sm)
             .background(isSelected ? AppTheme.Colors.accent.opacity(0.12) : AppTheme.Colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.medium, style: .continuous))
@@ -241,8 +244,10 @@ struct AddTransactionView: View {
                 Text("New")
                     .font(.appSans(11))
                     .foregroundStyle(AppTheme.Colors.textMuted)
+                    .padding(.horizontal, AppTheme.Spacing.xs)
             }
             .frame(maxWidth: .infinity)
+            .padding(.horizontal, AppTheme.Spacing.xs)
             .padding(.vertical, AppTheme.Spacing.sm)
             .background(AppTheme.Colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.medium, style: .continuous))

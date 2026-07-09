@@ -56,7 +56,7 @@ enum AppTheme {
         static let accent      = Color(light: "#4B6BCC", dark: "#7B8FD4")
         static let accentAlt   = Color(light: "#3A5AB8", dark: "#6A7EC4")
         static let income      = Color(light: "#2E8E6E", dark: "#5AAAC8")
-        static let expense     = Color(light: "#B85450", dark: "#D47878")
+        static let expense     = Color(light: "#F05151", dark: "#F87878")
         static let danger      = Color(light: "#C0392B", dark: "#E0564A")
         static let textPrimary = Color(light: "#1A1F3C", dark: "#EEEEF8")
         static let textMuted   = Color(light: "#6470A0", dark: "#8888AA")
@@ -173,11 +173,11 @@ extension Font {
 
 // MARK: - Card Style
 
-/// White surface container for the grouped transaction list. Padding is 0 by
-/// default so the rows inside control their own insets; corner radius 18 with a
-/// soft shadow and no border.
+/// White surface container with a soft shadow and 18pt corner radius.
+/// Content is inset by default so labels and icons never sit flush on the edge.
+/// Pass `padding: 0` for list cards whose rows supply their own insets.
 struct CardStyle: ViewModifier {
-    var padding: CGFloat = 0
+    var padding: CGFloat = AppTheme.Spacing.md
 
     func body(content: Content) -> some View {
         content
@@ -189,9 +189,9 @@ struct CardStyle: ViewModifier {
 }
 
 extension View {
-    /// Wraps grouped transaction lists in the white surface card (background,
-    /// radius, soft shadow). Pass `padding` if the content needs inset.
-    func cardStyle(padding: CGFloat = 0) -> some View {
+    /// Wraps content in the white surface card (background, radius, soft shadow).
+    /// Pass `padding: 0` when child rows already control their own insets.
+    func cardStyle(padding: CGFloat = AppTheme.Spacing.md) -> some View {
         modifier(CardStyle(padding: padding))
     }
 }

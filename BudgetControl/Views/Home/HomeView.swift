@@ -437,7 +437,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .cardStyle()
+            .cardStyle(padding: 0)
         }
     }
 

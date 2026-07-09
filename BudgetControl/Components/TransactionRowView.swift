@@ -55,7 +55,7 @@ struct TransactionRowView: View {
                 .font(.appSans(AppTheme.Typography.fontBody, weight: .semibold))
                 .foregroundStyle(isIncome ? AppTheme.Colors.income : AppTheme.Colors.expense)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, AppTheme.Spacing.xs)
         .contentShape(Rectangle())
     }
 }
