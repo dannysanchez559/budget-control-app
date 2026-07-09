@@ -1,4 +1,4 @@
-# Finance Tracker App
+# Budget Control App
 
 A personal finance tracking mobile app — currently built as a React web prototype, ready to be converted to a native iOS app for the App Store.
 
@@ -114,4 +114,3 @@ Please preserve this aesthetic in the native version.
 ---
 
 **Thank you for considering this project!**
-# natalia-finance-tracker

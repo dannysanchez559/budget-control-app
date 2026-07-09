@@ -1,4 +1,4 @@
-name: Finna
+name: BudgetControl
 options:
   bundleIdPrefix: com.danielsanchez
   deploymentTarget:
@@ -11,15 +11,16 @@ settings:
     SWIFT_VERSION: "5.0"
     DEVELOPMENT_LANGUAGE: en
 targets:
-  Finna:
+  BudgetControl:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: FinanceTracker
+      - path: BudgetControl
     info:
-      path: FinanceTracker/Info.plist
+      path: BudgetControl/Info.plist
       properties:
+        CFBundleDisplayName: Budget Control
         UILaunchScreen:
           UIColorName: LaunchBackground
         UIApplicationSceneManifest:
@@ -28,9 +29,19 @@ targets:
           - UIInterfaceOrientationPortrait
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.danielsanchez.finna
-        PRODUCT_NAME: Finna
+        PRODUCT_BUNDLE_IDENTIFIER: com.danielsanchez.budgetcontrol
+        PRODUCT_NAME: Budget Control
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+
+schemes:
+  BudgetControl:
+    build:
+      targets:
+        BudgetControl: all
+    run:
+      config: Debug
+    archive:
+      config: Release

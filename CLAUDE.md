@@ -1,4 +1,4 @@
-# CLAUDE.md — Finance Tracker iOS App
+# CLAUDE.md — Budget Control iOS App
 
 This file gives Claude Code the context it needs to work effectively on this project. Read this before making any changes.
 
@@ -32,7 +32,7 @@ Phase 5 — FINISHING       UI polish, animations, haptics, empty states, edge c
 Build all SwiftData models, DataStore with seed logic, and AppTheme constants. Zero UI. This must compile cleanly before any views are written. Everything downstream depends on this being correct.
 
 **Phase 2 — Foundation (App Shell)**
-`FinanceTrackerApp.swift`, `MainTabView.swift`, onboarding gate (UserDefaults check). The app launches, shows the tab bar, and each tab renders a `Text("placeholder")`. Nothing more.
+`BudgetControlApp.swift`, `MainTabView.swift`, onboarding gate (UserDefaults check). The app launches, shows the tab bar, and each tab renders a `Text("placeholder")`. Nothing more.
 
 **Phase 3 — Framing (Screen Skeletons)**
 Every screen file exists. Every sheet and modal can be opened and dismissed. Navigation is fully wired. No real data, no real logic yet — just the scaffolding of every view with correct layout containers and placeholder text. The complete skeleton of the house.
@@ -88,8 +88,8 @@ There is no package manager setup yet. Do not add any Swift Package Manager depe
 ## Project Structure
 
 ```
-FinanceTracker/
-├── FinanceTrackerApp.swift
+BudgetControl/
+├── BudgetControlApp.swift
 ├── Models/
 │   ├── Transaction.swift
 │   ├── Wallet.swift

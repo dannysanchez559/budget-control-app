@@ -4,7 +4,7 @@
 
 1. Convert React Web App to Native iOS App + Publish to App Store
 2. iOS Developer Needed: React Native Port + App Store Submission
-3. Build & Publish iOS Finance Tracker App (Code Provided)
+3. Build & Publish iOS Budget Control App (Code Provided)
 
 ## Job Description:
 

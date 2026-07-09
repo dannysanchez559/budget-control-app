@@ -1,5 +1,5 @@
 # Product Requirements Document
-## Finance Tracker — iOS App (MVP)
+## Budget Control — iOS App (MVP)
 
 **Version:** 1.0  
 **Date:** May 18, 2026  
@@ -11,7 +11,7 @@
 
 ## 1. Product Overview
 
-Finance Tracker is a personal finance management iOS app targeting users — particularly women — who want a simple, beautiful, and private way to track their money. The product originated as a React/JSX web prototype built in Claude Code and is being rebuilt natively in SwiftUI for the Apple App Store.
+Budget Control is a personal finance management iOS app targeting users — particularly women — who want a simple, beautiful, and private way to track their money. The product originated as a React/JSX web prototype built in Claude Code and is being rebuilt natively in SwiftUI for the Apple App Store.
 
 The core philosophy: **local-first, privacy-first, no accounts, no servers, no ads.** All data lives on the user's device.
 

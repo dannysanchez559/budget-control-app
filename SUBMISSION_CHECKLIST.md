@@ -1,7 +1,7 @@
-# App Store Submission Checklist — Finna
+# App Store Submission Checklist — Budget Control
 
 - [ ] App name confirmed with client
-- [ ] Bundle ID registered in App Store Connect
+- [ ] Bundle ID `com.danielsanchez.budgetcontrol` registered in App Store Connect
 - [ ] Apple Developer account enrolled ($99/year)
 - [ ] App icon 1024x1024 PNG exported and uploaded
 - [ ] Screenshots captured for iPhone 16 Pro Max (6.7"), iPhone 14 Plus (6.5"), iPhone 8 Plus (5.5")

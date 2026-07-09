@@ -1,6 +1,6 @@
-# App Store Metadata — Finna
+# App Store Metadata — Budget Control
 
-**App Name:** Finna
+**App Name:** Budget Control
 
 **Subtitle (30 chars max):** _Choose one — confirm with client:_
 - Simple money tracker
@@ -15,7 +15,7 @@
 
 ## Description
 
-A clean, simple, and private way to track your money. Finna helps you stay on top of your spending without connecting your bank accounts or creating an account.
+A clean, simple, and private way to track your money. Budget Control helps you stay on top of your spending without connecting your bank accounts or creating an account.
 
 Features:
 - Track income and expenses across multiple wallets
