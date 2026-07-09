@@ -3,7 +3,7 @@
 //  Budget Control
 //
 //  Dashboard — the most visible screen. Professional pastel layout: greeting
-//  header with avatar, a gradient hero balance card (this month, income/expense
+//  header with settings control, a gradient hero balance card (this month, income/expense
 //  split), a horizontal Accounts strip of pastel AccountCards (all-time wallet
 //  balances), a pastel BudgetCard grid, optional quick-add pills, and recent
 //  transactions (last 3 days) grouped into white cards. All data is read from
@@ -127,8 +127,8 @@ struct HomeView: View {
                 Button {
                     showingSettings = true
                 } label: {
-                    Text("F")
-                        .font(.appSans(16, weight: .semibold))
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
                         .background(AppTheme.Colors.accent)
