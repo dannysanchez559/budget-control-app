@@ -141,7 +141,8 @@ struct HomeView: View {
     }
 
     private var monthTitle: String {
-        Date.now.formatted(.dateTime.month(.wide).year())
+        _ = store.calendarPeriodId
+        return Date.now.formatted(.dateTime.month(.wide).year())
     }
 
     // MARK: - Active Trip Banner
@@ -183,9 +184,13 @@ struct HomeView: View {
 
     // MARK: - Hero Balance Card
 
-    private var monthTransactions: [Transaction] { transactions.inMonth() }
+    private var monthTransactions: [Transaction] {
+        _ = store.calendarPeriodId
+        return transactions.inMonth()
+    }
 
     private var lastMonthTransactions: [Transaction] {
+        _ = store.calendarPeriodId
         let lastMonth = Calendar.current.date(byAdding: .month, value: -1, to: .now) ?? .now
         return transactions.inMonth(of: lastMonth)
     }

@@ -37,6 +37,10 @@ struct SettingsView: View {
     @State private var resultMessage: String?
     @State private var showingResultAlert = false
 
+    // Data reset flows.
+    @State private var showingClearMonthConfirm = false
+    @State private var showingWipeAllConfirm = false
+
     var body: some View {
         @Bindable var store = store
 
@@ -45,6 +49,7 @@ struct SettingsView: View {
                 appearanceSection(store: store)
                 currencySection
                 dataSection
+                resetSection
                 aboutSection
             }
             .listStyle(.insetGrouped)
@@ -84,6 +89,18 @@ struct SettingsView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(resultMessage ?? "")
+            }
+            .alert("Clear this month?", isPresented: $showingClearMonthConfirm) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete Transactions", role: .destructive) { clearCurrentMonthTransactions() }
+            } message: {
+                Text(clearMonthConfirmMessage)
+            }
+            .alert("Erase all app data?", isPresented: $showingWipeAllConfirm) {
+                Button("Cancel", role: .cancel) {}
+                Button("Erase Everything", role: .destructive) { wipeAllAppData() }
+            } message: {
+                Text("This permanently deletes all transactions, wallets, categories, budget limits, trips, goals, subscriptions, recurring rules, and quick actions. Default wallets and categories will be restored. Display settings reset to USD and light mode. This cannot be undone.")
             }
             .onAppear(perform: regenerateExports)
             .onChange(of: transactions.count) { _, _ in regenerateExports() }
@@ -180,7 +197,83 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Section 4: About
+    // MARK: - Section 4: Reset
+
+    private var currentMonthLabel: String {
+        _ = store.calendarPeriodId
+        return Date.now.formatted(.dateTime.month(.wide).year())
+    }
+
+    private var currentMonthTransactionCount: Int {
+        _ = store.calendarPeriodId
+        return transactions.filter {
+            Calendar.current.isDate($0.date, equalTo: .now, toGranularity: .month)
+        }.count
+    }
+
+    private var clearMonthConfirmMessage: String {
+        let count = currentMonthTransactionCount
+        if count == 0 {
+            return "There are no transactions in \(currentMonthLabel). Budget limits, wallets, categories, and plans will be kept."
+        }
+        return "Delete \(count) transaction\(count == 1 ? "" : "s") from \(currentMonthLabel)? Budget limits, wallets, categories, and plans will be kept."
+    }
+
+    private var resetSection: some View {
+        Section {
+            Button {
+                showingClearMonthConfirm = true
+            } label: {
+                resetRow(
+                    icon: "calendar.badge.minus",
+                    label: "Clear This Month's Transactions",
+                    subtitle: currentMonthTransactionCount == 0
+                        ? "No transactions in \(currentMonthLabel)"
+                        : "\(currentMonthTransactionCount) in \(currentMonthLabel)"
+                )
+            }
+
+            Button(role: .destructive) {
+                showingWipeAllConfirm = true
+            } label: {
+                resetRow(
+                    icon: "trash.fill",
+                    label: "Erase All App Data",
+                    subtitle: "Start over from scratch",
+                    destructive: true
+                )
+            }
+        } header: {
+            sectionHeader("Reset")
+        } footer: {
+            Text("Clear month removes only this month's income and expense records. Erase all data resets the entire app to its default setup.")
+                .font(.appSans(AppTheme.Typography.fontLabel))
+                .foregroundStyle(AppTheme.Colors.textMuted)
+        }
+    }
+
+    private func resetRow(
+        icon: String,
+        label: String,
+        subtitle: String,
+        destructive: Bool = false
+    ) -> some View {
+        HStack(spacing: AppTheme.Spacing.md) {
+            Image(systemName: icon)
+                .foregroundStyle(destructive ? AppTheme.Colors.danger : AppTheme.Colors.accent)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.appSans(AppTheme.Typography.fontBody))
+                    .foregroundStyle(destructive ? AppTheme.Colors.danger : AppTheme.Colors.textPrimary)
+                Text(subtitle)
+                    .font(.appSans(AppTheme.Typography.fontLabel))
+                    .foregroundStyle(AppTheme.Colors.textMuted)
+            }
+        }
+    }
+
+    // MARK: - Section 5: About
 
     private var aboutSection: some View {
         Section {
@@ -364,6 +457,34 @@ struct SettingsView: View {
             trip.isActive = (trip.id == activeId)
         }
         try? modelContext.save()
+    }
+
+    // MARK: - Data Reset Actions
+
+    private func clearCurrentMonthTransactions() {
+        do {
+            let deleted = try store.deleteCurrentMonthTransactions(context: modelContext)
+            regenerateExports()
+            if deleted == 0 {
+                resultMessage = "No transactions were found in \(currentMonthLabel)."
+            } else {
+                resultMessage = "Deleted \(deleted) transaction\(deleted == 1 ? "" : "s") from \(currentMonthLabel). Budget limits and other data were kept."
+            }
+        } catch {
+            resultMessage = "Could not clear this month's transactions: \(error.localizedDescription)"
+        }
+        showingResultAlert = true
+    }
+
+    private func wipeAllAppData() {
+        do {
+            try store.wipeAllAppData(context: modelContext)
+            regenerateExports()
+            resultMessage = "All app data was erased. Default wallets and categories have been restored."
+        } catch {
+            resultMessage = "Could not erase app data: \(error.localizedDescription)"
+        }
+        showingResultAlert = true
     }
 }
 

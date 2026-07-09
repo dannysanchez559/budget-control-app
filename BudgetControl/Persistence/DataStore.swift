@@ -54,7 +54,12 @@ final class DataStore {
         static let budgetLimits = "budgetLimits"
         static let quickActions = "quickActions"
         static let recurringProcessorV1 = "recurringProcessorV1"
+        static let lastSeenCalendarPeriodId = "lastSeenCalendarPeriodId"
     }
+
+    /// Changes when the calendar month/year rolls over. Views that filter by
+    /// the current month should read this so month-scoped UI refreshes on foreground.
+    private(set) var calendarPeriodId: String = DataStore.currentCalendarPeriodId()
 
     var currencyCode: String = UserDefaults.standard.string(forKey: Keys.currencyCode) ?? "USD" {
         didSet { UserDefaults.standard.set(currencyCode, forKey: Keys.currencyCode) }
@@ -120,6 +125,63 @@ final class DataStore {
 
     static func currencyInfo(for code: String) -> CurrencyInfo {
         currencies.first { $0.code == code } ?? currencies[0]
+    }
+
+    // MARK: - Calendar Period
+
+    static func currentCalendarPeriodId(calendar: Calendar = .current, date: Date = .now) -> String {
+        let components = calendar.dateComponents([.year, .month], from: date)
+        let year = components.year ?? 0
+        let month = components.month ?? 0
+        return String(format: "%04d-%02d", year, month)
+    }
+
+    /// Call when the app launches or returns to the foreground. Bumps
+    /// `calendarPeriodId` when the month changes so month-scoped UI refreshes.
+    func refreshCalendarPeriodIfNeeded(calendar: Calendar = .current) {
+        let current = Self.currentCalendarPeriodId(calendar: calendar)
+        UserDefaults.standard.set(current, forKey: Keys.lastSeenCalendarPeriodId)
+        if current != calendarPeriodId {
+            calendarPeriodId = current
+        }
+    }
+
+    // MARK: - Data Reset
+
+    /// Deletes every transaction dated in the current calendar month.
+    /// Budget limits, wallets, categories, plans, and settings are kept.
+    @discardableResult
+    func deleteCurrentMonthTransactions(context: ModelContext, calendar: Calendar = .current) throws -> Int {
+        let all = try context.fetch(FetchDescriptor<Transaction>())
+        let toDelete = all.filter { calendar.isDate($0.date, equalTo: .now, toGranularity: .month) }
+        toDelete.forEach { context.delete($0) }
+        try context.save()
+        context.processPendingChanges()
+        return toDelete.count
+    }
+
+    /// Factory reset: wipes all SwiftData records and app preferences, then
+    /// re-seeds the default wallets and categories.
+    func wipeAllAppData(context: ModelContext) throws {
+        try context.delete(model: Transaction.self)
+        try context.delete(model: Wallet.self)
+        try context.delete(model: AppCategory.self)
+        try context.delete(model: Trip.self)
+        try context.delete(model: SavingsGoal.self)
+        try context.delete(model: Subscription.self)
+        try context.delete(model: RecurringRule.self)
+        try context.save()
+        context.processPendingChanges()
+
+        budgetLimits = [:]
+        quickActions = []
+        activeTripId = nil
+        currencyCode = "USD"
+        isDarkMode = false
+        UserDefaults.standard.removeObject(forKey: Keys.recurringProcessorV1)
+
+        seedIfNeeded(context: context)
+        refreshCalendarPeriodIfNeeded()
     }
 
     // MARK: - Seeding

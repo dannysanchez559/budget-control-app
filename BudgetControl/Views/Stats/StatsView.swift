@@ -46,6 +46,7 @@ struct StatsView: View {
 
     /// Expense transactions inside the selected period.
     private var periodExpenses: [Transaction] {
+        _ = store.calendarPeriodId
         let calendar = Calendar.current
         let now = Date.now
         return transactions.filter { tx in
@@ -235,7 +236,8 @@ struct StatsView: View {
 
     /// Expense transactions in the current calendar month (budget limits are monthly).
     private var monthExpenseTransactions: [Transaction] {
-        transactions.filter {
+        _ = store.calendarPeriodId
+        return transactions.filter {
             $0.type == "expense"
                 && Calendar.current.isDate($0.date, equalTo: .now, toGranularity: .month)
         }

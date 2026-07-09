@@ -29,11 +29,13 @@ struct ContentView: View {
         .tint(AppTheme.Colors.accent)
         .task {
             store.seedIfNeeded(context: modelContext)
+            store.refreshCalendarPeriodIfNeeded()
             store.processRecurringRules(context: modelContext)
             hasOnboarded = store.hasOnboarded
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
+                store.refreshCalendarPeriodIfNeeded()
                 store.processRecurringRules(context: modelContext)
             }
         }
