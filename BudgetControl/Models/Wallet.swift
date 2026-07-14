@@ -15,18 +15,21 @@ final class Wallet {
     var emoji: String
     var colorHex: String
     var isDefault: Bool
+    var isCreditCard: Bool
 
     init(
         id: String = UUID().uuidString,
         name: String = "",
         emoji: String = "💵",
         colorHex: String = "#7AC9A6",
-        isDefault: Bool = false
+        isDefault: Bool = false,
+        isCreditCard: Bool = false
     ) {
         self.id = id
         self.name = name
         self.emoji = emoji
         self.colorHex = colorHex
         self.isDefault = isDefault
+        self.isCreditCard = isCreditCard
     }
 }

@@ -61,7 +61,19 @@ struct AddTransactionView: View {
     private var isEditing: Bool { editing != nil }
 
     private var visibleCategories: [AppCategory] {
-        categories.filter { $0.type == type }
+        categories.filter { $0.type == type && $0.id != "cat-card-payment" }
+    }
+
+    /// Credit-card wallets can't receive normal "Income" entries — payments
+    /// against them go through the dedicated `CardPaymentView` flow instead,
+    /// which enforces the no-overpay cap. When editing an existing
+    /// transaction, the already-selected wallet is kept visible even if it's
+    /// a credit card, so opening a past card payment never silently clears
+    /// its wallet. New transactions get no such exception, even if a credit
+    /// card wallet happens to be the pre-selected default.
+    private var visibleWallets: [Wallet] {
+        guard type == "income" else { return wallets }
+        return wallets.filter { !$0.isCreditCard || (isEditing && $0.id == walletId) }
     }
 
     /// Active accent shifts with the selected transaction type.
@@ -100,7 +112,10 @@ struct AddTransactionView: View {
                 }
             }
             .onAppear(perform: loadInitialState)
-            .onChange(of: type) { _, _ in ensureCategoryMatchesType() }
+            .onChange(of: type) { _, _ in
+                ensureCategoryMatchesType()
+                ensureWalletMatchesType()
+            }
             .sheet(isPresented: $showingAddCategory) {
                 AddCategoryView(type: type) { newId in
                     categoryId = newId
@@ -170,7 +185,7 @@ struct AddTransactionView: View {
             sectionLabel("Wallet")
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: AppTheme.Spacing.sm) {
-                    ForEach(Array(wallets.enumerated()), id: \.element.id) { index, wallet in
+                    ForEach(Array(visibleWallets.enumerated()), id: \.element.id) { index, wallet in
                         walletChip(wallet, index: index)
                     }
                 }
@@ -351,6 +366,15 @@ struct AddTransactionView: View {
     private func ensureCategoryMatchesType() {
         if !visibleCategories.contains(where: { $0.id == categoryId }) {
             categoryId = visibleCategories.first?.id ?? ""
+        }
+    }
+
+    /// Clears the wallet selection if switching to "Income" leaves a credit
+    /// card wallet selected — credit cards can't take normal income entries.
+    private func ensureWalletMatchesType() {
+        if !visibleWallets.contains(where: { $0.id == walletId }) {
+            walletId = wallets.first(where: { $0.isDefault && !$0.isCreditCard })?.id
+                ?? wallets.first(where: { !$0.isCreditCard })?.id ?? ""
         }
     }
 

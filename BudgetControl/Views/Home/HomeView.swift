@@ -28,6 +28,7 @@ struct HomeView: View {
     @State private var showingSearch = false
     @State private var showingAllTransactions = false
     @State private var showingWalletManager = false
+    @State private var payingWallet: Wallet?
     @State private var pendingDelete: Transaction?
 
     // UserDefaults-backed settings are not @Observable, so mirror them in
@@ -85,6 +86,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingWalletManager) {
                 WalletManagerView()
+            }
+            .sheet(item: $payingWallet) { wallet in
+                CardPaymentView(wallet: wallet)
             }
             .confirmationDialog(
                 "Delete this transaction?",
@@ -292,11 +296,24 @@ struct HomeView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(Array(wallets.enumerated()), id: \.element.id) { index, wallet in
-                        AccountCard(
-                            wallet: wallet,
-                            balance: transactions.balance(forWallet: wallet.id),
-                            index: index
-                        )
+                        if wallet.isCreditCard {
+                            Button {
+                                payingWallet = wallet
+                            } label: {
+                                AccountCard(
+                                    wallet: wallet,
+                                    balance: transactions.balance(forWallet: wallet.id),
+                                    index: index
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            AccountCard(
+                                wallet: wallet,
+                                balance: transactions.balance(forWallet: wallet.id),
+                                index: index
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal, edgePadding)

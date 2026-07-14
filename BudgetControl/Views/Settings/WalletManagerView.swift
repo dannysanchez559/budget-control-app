@@ -137,6 +137,8 @@ private struct WalletFormView: View {
 
     @State private var name = ""
     @State private var symbol = "banknote.fill"
+    @State private var isCreditCard = false
+    @State private var showingCardPayment = false
 
     private let symbolChoices = [
         "banknote.fill", "creditcard.fill", "building.columns.fill",
@@ -175,7 +177,30 @@ private struct WalletFormView: View {
                         }
                         .cardStyle()
 
+                        VStack(spacing: AppTheme.Spacing.md) {
+                            Toggle("Credit card", isOn: $isCreditCard)
+                                .font(.appSans(15))
+                                .foregroundStyle(AppTheme.Colors.textPrimary)
+                                .tint(AppTheme.Colors.accent)
+                        }
+                        .cardStyle()
+
                         iconPicker
+
+                        if !isNew, isCreditCard {
+                            Button {
+                                showingCardPayment = true
+                            } label: {
+                                Text("Pay Down Balance")
+                                    .font(.appSans(15, weight: .semibold))
+                                    .foregroundStyle(AppTheme.Colors.income)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(AppTheme.Colors.income.opacity(0.12))
+                                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.medium, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                        }
 
                         if canDelete, onDelete != nil {
                             Button(role: .destructive, action: { onDelete?() }) {
@@ -210,6 +235,11 @@ private struct WalletFormView: View {
                 }
             }
             .onAppear(perform: loadState)
+            .sheet(isPresented: $showingCardPayment) {
+                if let wallet {
+                    CardPaymentView(wallet: wallet)
+                }
+            }
         }
     }
 
@@ -244,6 +274,7 @@ private struct WalletFormView: View {
     private func loadState() {
         if let wallet {
             name = wallet.name
+            isCreditCard = wallet.isCreditCard
             let stored = wallet.emoji
             symbol = !stored.isEmpty && stored.allSatisfy(\.isASCII)
                 ? stored
@@ -258,13 +289,15 @@ private struct WalletFormView: View {
         if let wallet {
             wallet.name = trimmed
             wallet.emoji = symbol
+            wallet.isCreditCard = isCreditCard
         } else {
             let newWallet = Wallet(
                 id: "wallet-\(UUID().uuidString.prefix(8))",
                 name: trimmed,
                 emoji: symbol,
                 colorHex: "#7AC9A6",
-                isDefault: false
+                isDefault: false,
+                isCreditCard: isCreditCard
             )
             modelContext.insert(newWallet)
         }

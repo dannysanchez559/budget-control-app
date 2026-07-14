@@ -36,6 +36,7 @@ struct IconMap {
         case "gift":      return "gift.fill"
         case "invest":    return "chart.line.uptrend.xyaxis"
         case "other_i":   return "sparkles"
+        case "card-payment": return "creditcard.fill"
         default:
             if !storedIcon.isEmpty, storedIcon.allSatisfy(\.isASCII) { return storedIcon }
             return "circle.fill"
@@ -79,7 +80,7 @@ struct IconMap {
     private static func categoryIndex(_ id: String) -> Int {
         let order = ["food", "transport", "home", "fun", "health", "shop",
                      "travel", "other_e", "salary", "freelance", "gift",
-                     "invest", "other_i"]
+                     "invest", "other_i", "card-payment"]
         let key = normalize(id)
         if let i = order.firstIndex(of: key) { return i }
         // Stable fallback for user-created categories (hashValue is randomized

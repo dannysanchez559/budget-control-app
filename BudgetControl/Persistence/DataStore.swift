@@ -194,7 +194,7 @@ final class DataStore {
         // Default wallets
         let wallets: [Wallet] = [
             Wallet(id: "wallet-cash",    name: "Cash",    emoji: "💵", colorHex: "#7AC9A6", isDefault: true),
-            Wallet(id: "wallet-card",    name: "Card",    emoji: "💳", colorHex: "#7A9CC6", isDefault: true),
+            Wallet(id: "wallet-card",    name: "Card",    emoji: "💳", colorHex: "#7A9CC6", isDefault: true, isCreditCard: true),
             Wallet(id: "wallet-savings", name: "Savings", emoji: "🐷", colorHex: "#D4A574", isDefault: true),
         ]
 
@@ -217,6 +217,7 @@ final class DataStore {
             AppCategory(id: "cat-gift",       label: "Gift",       emoji: "🎁", colorHex: "#C9B87A", type: "income", isDefault: true),
             AppCategory(id: "cat-investment", label: "Investment", emoji: "📈", colorHex: "#7AC9B8", type: "income", isDefault: true),
             AppCategory(id: "cat-other-inc",  label: "Other",      emoji: "✨", colorHex: "#B8A87A", type: "income", isDefault: true),
+            AppCategory(id: "cat-card-payment", label: "Card Payment", emoji: "💳", colorHex: "#7A9CC6", type: "income", isDefault: true),
         ]
 
         wallets.forEach { context.insert($0) }

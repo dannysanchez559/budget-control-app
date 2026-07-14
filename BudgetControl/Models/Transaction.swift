@@ -21,6 +21,7 @@ final class Transaction {
     var tripId: String?
     var date: Date
     var fromRecurringId: String?
+    var isCardPayment: Bool
 
     init(
         id: UUID = UUID(),
@@ -33,7 +34,8 @@ final class Transaction {
         tags: [String] = [],
         tripId: String? = nil,
         date: Date = .now,
-        fromRecurringId: String? = nil
+        fromRecurringId: String? = nil,
+        isCardPayment: Bool = false
     ) {
         self.id = id
         self.type = type
@@ -46,5 +48,6 @@ final class Transaction {
         self.tripId = tripId
         self.date = date
         self.fromRecurringId = fromRecurringId
+        self.isCardPayment = isCardPayment
     }
 }

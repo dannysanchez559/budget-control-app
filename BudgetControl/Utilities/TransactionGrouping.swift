@@ -50,9 +50,11 @@ extension Array where Element == Transaction {
         reduce(0) { $0 + ($1.type == "income" ? $1.amount : -$1.amount) }
     }
 
-    /// Total of just the income transactions.
+    /// Total of just the income transactions. Card payments are excluded —
+    /// they're a debt paydown, not earned income, even though they still
+    /// count toward the wallet's own balance via `signedTotal`.
     var incomeTotal: Double {
-        filter { $0.type == "income" }.reduce(0) { $0 + $1.amount }
+        filter { $0.type == "income" && !$0.isCardPayment }.reduce(0) { $0 + $1.amount }
     }
 
     /// Total of just the expense transactions.
