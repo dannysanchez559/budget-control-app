@@ -56,13 +56,13 @@
 		0B70F88CA6AB94E5CB0E5079 /* PastelCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastelCard.swift; sourceTree = "<group>"; };
 		1B21CABB8C15E678901C132E /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		1B235ECD1E9A8A4A60C99DCB /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
-		1D4F51799909DDFD09019747 /* BudgetControl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BudgetControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D4F51799909DDFD09019747 /* Budget Control.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Budget Control.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EAC6C0A15D7A07798D4814 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		2AB75D7ED5EBBCE00DE71A6C /* PlansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansView.swift; sourceTree = "<group>"; };
 		2B159737674855E47C92AE2D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		2FFC6BE2D1023DE079F3260A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3049348EF230EB75ED2273B1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		32BAA15822D7F6D83E8BFA13 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		32BAA15822D7F6D83E8BFA13 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		357D4B84368ABBF084596D7D /* TransactionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRowView.swift; sourceTree = "<group>"; };
 		3F8D7ACD37A6C27BE34E26B7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		44903CD83B328C8B9A7FEDD4 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
@@ -206,7 +206,7 @@
 		A39CC40BAD949FCA79830D4E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D4F51799909DDFD09019747 /* BudgetControl.app */,
+				1D4F51799909DDFD09019747 /* Budget Control.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -295,7 +295,7 @@
 			packageProductDependencies = (
 			);
 			productName = BudgetControl;
-			productReference = 1D4F51799909DDFD09019747 /* BudgetControl.app */;
+			productReference = 1D4F51799909DDFD09019747 /* Budget Control.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -306,8 +306,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 6997F4914D941C8F64ECE168 /* Build configuration list for PBXProject "BudgetControl" */;
 			developmentRegion = en;
@@ -455,6 +453,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = NDNN4592Y3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -475,6 +474,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = NDNN4592Y3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
