@@ -11,10 +11,10 @@
 		05076B74CBD95A22BDE29923 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44903CD83B328C8B9A7FEDD4 /* HapticManager.swift */; };
 		089B9BCA8D3DF62B4B880CB3 /* PlansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB75D7ED5EBBCE00DE71A6C /* PlansView.swift */; };
 		0B047B18B50264C87FB46BDC /* BudgetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918DF3C63DA15BF01587D3DD /* BudgetCard.swift */; };
+		0F530855C1B72511B79B73CD /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 32BAA15822D7F6D83E8BFA13 /* PrivacyInfo.xcprivacy */; };
 		11C813DB3DD9A9DFFCF421FF /* FloatingAddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07B38236381258F10233B9E /* FloatingAddButton.swift */; };
 		1CF1E766841FF9262F6DCF20 /* TransactionGrouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B801CCB3DF8E96F2C6B0BE /* TransactionGrouping.swift */; };
 		2731C6306DAA5C120F79915B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2FFC6BE2D1023DE079F3260A /* Assets.xcassets */; };
-		836C7AB113AE46C086D65C22 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6B2DA4CFAA4342F3A8F7524B /* PrivacyInfo.xcprivacy */; };
 		280F949B95B0402DEA9B263F /* Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CD22833CF99854379803B3 /* Wallet.swift */; };
 		2F3C8A07931E721F4658E27E /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A28C15479F9E2EE46F67F984 /* Transaction.swift */; };
 		3017161643680E85CA73A62A /* AllTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C6D698DD3288F27F496523 /* AllTransactionsView.swift */; };
@@ -27,6 +27,7 @@
 		57E247239065D9CD0C8593BD /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742CBC51ED2AB7CA7F1760BD /* Trip.swift */; };
 		5B33672396EAE4541097D2AD /* AccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C13456A951D5C26D4A421B1 /* AccountCard.swift */; };
 		5BCC474C503FBD59730420B2 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA4E95BF6FF762F9013328 /* PrimaryButton.swift */; };
+		5D2B4B03550DB773B0C76B04 /* CardPaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0AC9B2A30FBAF33D6261038 /* CardPaymentView.swift */; };
 		5EE347E269142C27DD401D03 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C11D99CACFE5B85DF13464 /* AddTransactionView.swift */; };
 		64BB3A850747952CD0E886E3 /* BudgetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90E9792B83BDAC45EBD3A27 /* BudgetManagerView.swift */; };
 		694520D4AF7E22EF247BB6AF /* RecurringRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C688B2483478B26933E4AF91 /* RecurringRule.swift */; };
@@ -43,7 +44,6 @@
 		B644C7D0AEACD90DFE776EAD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F8D7ACD37A6C27BE34E26B7 /* SettingsView.swift */; };
 		C9C9BE5376C5C44D092BBE8E /* SavingsGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DE82677D3397648AA2822B9 /* SavingsGoal.swift */; };
 		CD5F40C53AA0A05D665B02FB /* PastelCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B70F88CA6AB94E5CB0E5079 /* PastelCard.swift */; };
-		CEC8BD17857642AA9E7F2A0D /* CardPaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F39A26F9BF4F5EB32D0E85 /* CardPaymentView.swift */; };
 		D13747179AD8D6FA6E5E46F4 /* AppCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDA93384DC3EA43BFDCBEBF /* AppCategory.swift */; };
 		D6F5D2F827CE5E3637BDE4D1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3049348EF230EB75ED2273B1 /* ContentView.swift */; };
 		E92A6E59B427C4941849C0A8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B159737674855E47C92AE2D /* OnboardingView.swift */; };
@@ -56,14 +56,13 @@
 		0B70F88CA6AB94E5CB0E5079 /* PastelCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastelCard.swift; sourceTree = "<group>"; };
 		1B21CABB8C15E678901C132E /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		1B235ECD1E9A8A4A60C99DCB /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
-		1D4F51799909DDFD09019747 /* Budget Control.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Budget Control.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D4F51799909DDFD09019747 /* BudgetControl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BudgetControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20EAC6C0A15D7A07798D4814 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		2AB75D7ED5EBBCE00DE71A6C /* PlansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlansView.swift; sourceTree = "<group>"; };
 		2B159737674855E47C92AE2D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		2FFC6BE2D1023DE079F3260A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		6B2DA4CFAA4342F3A8F7524B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3049348EF230EB75ED2273B1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		34F39A26F9BF4F5EB32D0E85 /* CardPaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPaymentView.swift; sourceTree = "<group>"; };
+		32BAA15822D7F6D83E8BFA13 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		357D4B84368ABBF084596D7D /* TransactionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRowView.swift; sourceTree = "<group>"; };
 		3F8D7ACD37A6C27BE34E26B7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		44903CD83B328C8B9A7FEDD4 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
@@ -95,6 +94,7 @@
 		E223B27FBEDE2C90C9EFC674 /* IconBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconBadge.swift; sourceTree = "<group>"; };
 		E56D9EB8196844699FDE314F /* BackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestore.swift; sourceTree = "<group>"; };
 		E5C6D698DD3288F27F496523 /* AllTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllTransactionsView.swift; sourceTree = "<group>"; };
+		F0AC9B2A30FBAF33D6261038 /* CardPaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPaymentView.swift; sourceTree = "<group>"; };
 		F6C11D99CACFE5B85DF13464 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -172,8 +172,8 @@
 				AE5389C9408051302D79E3D8 /* BudgetControlApp.swift */,
 				3049348EF230EB75ED2273B1 /* ContentView.swift */,
 				902EA630DE7DFD2A21528E0C /* Info.plist */,
-				6B2DA4CFAA4342F3A8F7524B /* PrivacyInfo.xcprivacy */,
 				20EAC6C0A15D7A07798D4814 /* MainTabView.swift */,
+				32BAA15822D7F6D83E8BFA13 /* PrivacyInfo.xcprivacy */,
 				D53923376C655D4682D91EA9 /* Components */,
 				E13E2205A3F2544D8D5F940E /* Models */,
 				635CAB12D18AEB682D861B09 /* Persistence */,
@@ -198,7 +198,7 @@
 			children = (
 				90AA151A844AD527F1DEF00A /* AddCategoryView.swift */,
 				F6C11D99CACFE5B85DF13464 /* AddTransactionView.swift */,
-				34F39A26F9BF4F5EB32D0E85 /* CardPaymentView.swift */,
+				F0AC9B2A30FBAF33D6261038 /* CardPaymentView.swift */,
 			);
 			path = Transactions;
 			sourceTree = "<group>";
@@ -206,7 +206,7 @@
 		A39CC40BAD949FCA79830D4E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D4F51799909DDFD09019747 /* Budget Control.app */,
+				1D4F51799909DDFD09019747 /* BudgetControl.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -295,7 +295,7 @@
 			packageProductDependencies = (
 			);
 			productName = BudgetControl;
-			productReference = 1D4F51799909DDFD09019747 /* Budget Control.app */;
+			productReference = 1D4F51799909DDFD09019747 /* BudgetControl.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -306,6 +306,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 6997F4914D941C8F64ECE168 /* Build configuration list for PBXProject "BudgetControl" */;
 			developmentRegion = en;
@@ -332,7 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2731C6306DAA5C120F79915B /* Assets.xcassets in Resources */,
-				836C7AB113AE46C086D65C22 /* PrivacyInfo.xcprivacy in Resources */,
+				0F530855C1B72511B79B73CD /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -346,7 +348,6 @@
 				5B33672396EAE4541097D2AD /* AccountCard.swift in Sources */,
 				4B9E91D0684BE00C3CCB8664 /* AddCategoryView.swift in Sources */,
 				5EE347E269142C27DD401D03 /* AddTransactionView.swift in Sources */,
-				CEC8BD17857642AA9E7F2A0D /* CardPaymentView.swift in Sources */,
 				3017161643680E85CA73A62A /* AllTransactionsView.swift in Sources */,
 				D13747179AD8D6FA6E5E46F4 /* AppCategory.swift in Sources */,
 				9513DE457872E7700D29F816 /* AppIconPreview.swift in Sources */,
@@ -356,6 +357,7 @@
 				FBC713FE0CB7BD06115597C6 /* BudgetControlApp.swift in Sources */,
 				64BB3A850747952CD0E886E3 /* BudgetManagerView.swift in Sources */,
 				A9F63B1B3453DFE405A5DE36 /* CalendarView.swift in Sources */,
+				5D2B4B03550DB773B0C76B04 /* CardPaymentView.swift in Sources */,
 				E987E3CFD137E576DCED3961 /* CardView.swift in Sources */,
 				D6F5D2F827CE5E3637BDE4D1 /* ContentView.swift in Sources */,
 				37B77811EB030A7E91C0A87C /* CurrencyPickerView.swift in Sources */,
@@ -453,7 +455,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NDNN4592Y3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -461,7 +462,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.danielsanchez.budgetcontrol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.developerNatalia.budgetcontrol;
 				PRODUCT_NAME = "Budget Control";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -474,7 +475,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NDNN4592Y3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -482,7 +482,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.danielsanchez.budgetcontrol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.developerNatalia.budgetcontrol;
 				PRODUCT_NAME = "Budget Control";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
