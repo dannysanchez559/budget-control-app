@@ -59,7 +59,7 @@ struct OnboardingView: View {
             VStack(spacing: AppTheme.Spacing.lg) {
                 TabView(selection: $currentPage) {
                     ForEach(Array(pages.enumerated()), id: \.element.id) { index, page in
-                        pageContent(page)
+                        pageContent(page, index: index)
                             .tag(index)
                     }
                 }
@@ -75,15 +75,45 @@ struct OnboardingView: View {
             }
             .padding(.bottom, AppTheme.Spacing.lg)
         }
+        .onChange(of: currentPage) { _, _ in
+            HapticManager.light()
+        }
     }
 
     // MARK: - Page Content
 
-    private func pageContent(_ page: Page) -> some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
+    private func pageContent(_ page: Page, index: Int) -> some View {
+        let isCurrent = index == currentPage
+
+        return VStack(spacing: AppTheme.Spacing.lg) {
             Spacer()
 
-            IconBadge(symbol: page.symbol, style: page.pastel, size: 96)
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [page.pastel.fill, page.pastel.fill.opacity(0)],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 140
+                        )
+                    )
+                    .frame(width: 280, height: 280)
+                    .blur(radius: 30)
+
+                RoundedRectangle(cornerRadius: 32, style: .continuous)
+                    .fill(page.pastel.badge)
+                    .frame(width: 120, height: 120)
+                    .shadow(color: .black.opacity(0.08), radius: 20, x: 0, y: 8)
+                    .overlay {
+                        Image(systemName: page.symbol)
+                            .font(.system(size: 120 * 0.4, weight: .semibold))
+                            .foregroundStyle(page.pastel.text)
+                    }
+            }
+            .scaleEffect(isCurrent ? 1.0 : 0.85)
+            .opacity(isCurrent ? 1.0 : 0.0)
+            .animation(.spring(response: 0.45, dampingFraction: 0.7), value: currentPage)
 
             Text(page.title)
                 .font(.appSans(AppTheme.Typography.fontTitle, weight: .semibold))
@@ -108,7 +138,7 @@ struct OnboardingView: View {
             ForEach(pages.indices, id: \.self) { index in
                 Capsule()
                     .fill(index == currentPage ? AppTheme.Colors.accent : AppTheme.Colors.border)
-                    .frame(width: index == currentPage ? 20 : 8, height: 8)
+                    .frame(width: index == currentPage ? 24 : 10, height: 10)
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentPage)
@@ -119,6 +149,7 @@ struct OnboardingView: View {
     private var ctaButton: some View {
         Button {
             if isLastPage {
+                HapticManager.success()
                 onFinish()
             } else {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -127,11 +158,11 @@ struct OnboardingView: View {
             }
         } label: {
             Text(isLastPage ? "Get Started" : "Continue")
-                .font(.appSans(AppTheme.Typography.fontBody, weight: .semibold))
+                .font(.appSans(AppTheme.Typography.fontBody, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
-                .background(AppTheme.Colors.accent)
+                .background(AppTheme.Colors.heroGradient)
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.medium, style: .continuous))
         }
         .padding(.horizontal, AppTheme.Spacing.lg)

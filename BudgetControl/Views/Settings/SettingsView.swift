@@ -42,18 +42,18 @@ struct SettingsView: View {
     @State private var showingWipeAllConfirm = false
 
     var body: some View {
-        @Bindable var store = store
-
         NavigationStack {
-            List {
-                appearanceSection(store: store)
-                currencySection
-                dataSection
-                resetSection
-                aboutSection
+            ScrollView {
+                VStack(spacing: AppTheme.Spacing.md) {
+                    appearanceSection(store: store)
+                    currencySection
+                    dataSection
+                    resetSection
+                    aboutSection
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, AppTheme.Spacing.md)
             }
-            .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
             .background(AppTheme.Colors.background)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -110,90 +110,76 @@ struct SettingsView: View {
     // MARK: - Section 1: Appearance
 
     private func appearanceSection(store: DataStore) -> some View {
-        @Bindable var store = store
-        return Section {
-            Toggle(isOn: $store.isDarkMode) {
-                Label {
-                    Text("Dark mode")
-                        .font(.appSans(AppTheme.Typography.fontBody))
-                        .foregroundStyle(AppTheme.Colors.textPrimary)
-                } icon: {
-                    Image(systemName: "moon.fill")
-                        .foregroundStyle(AppTheme.Colors.accent)
-                }
+        let isDarkModeBinding = Binding(
+            get: { store.isDarkMode },
+            set: { newValue in
+                HapticManager.light()
+                store.isDarkMode = newValue
             }
-            .tint(AppTheme.Colors.accent)
-        } header: {
-            sectionHeader("Appearance")
+        )
+        return SettingsSectionCard(title: "Appearance") {
+            HStack(spacing: AppTheme.Spacing.md) {
+                IconBadge(symbol: "moon.fill", style: .lavender, size: 32)
+                Text("Dark mode")
+                    .font(.appSans(AppTheme.Typography.fontBody, weight: .medium))
+                    .foregroundStyle(AppTheme.Colors.textPrimary)
+                Spacer()
+                Toggle("", isOn: isDarkModeBinding)
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.accent)
+            }
+            .padding(.horizontal, AppTheme.Spacing.md)
+            .padding(.vertical, AppTheme.Spacing.sm + 2)
         }
     }
 
     // MARK: - Section 2: Currency
 
     private var currencySection: some View {
-        Section {
+        SettingsSectionCard(title: "Currency") {
             Button {
                 showingCurrencyPicker = true
             } label: {
-                HStack {
-                    Label {
-                        Text("Display currency")
-                            .font(.appSans(AppTheme.Typography.fontBody))
-                            .foregroundStyle(AppTheme.Colors.textPrimary)
-                    } icon: {
-                        Image(systemName: "dollarsign.circle.fill")
-                            .foregroundStyle(AppTheme.Colors.accent)
-                    }
-                    Spacer()
-                    Text(store.currencyCode)
-                        .font(.appSans(AppTheme.Typography.fontBody))
-                        .foregroundStyle(AppTheme.Colors.textMuted)
-                    Image(systemName: "chevron.right")
-                        .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
-                        .foregroundStyle(AppTheme.Colors.textMuted)
-                }
+                SettingsRow(
+                    icon: "dollarsign.circle.fill",
+                    pastel: .mint,
+                    label: "Display currency",
+                    trailingText: store.currencyCode,
+                    showChevron: true
+                )
             }
-        } header: {
-            sectionHeader("Currency")
+            .buttonStyle(.plain)
         }
     }
 
     // MARK: - Section 3: Data
 
     private var dataSection: some View {
-        Section {
-            if let csvURL {
-                ShareLink(item: csvURL) {
-                    dataRow(icon: "tablecells", label: "Export CSV")
+        SettingsSectionCard(title: "Data") {
+            VStack(spacing: 0) {
+                if let csvURL {
+                    ShareLink(item: csvURL) {
+                        SettingsRow(icon: "square.and.arrow.up.fill", pastel: .sky, label: "Export CSV")
+                    }
+                    .buttonStyle(.plain)
+                    rowDivider
                 }
-            }
-            if let backupURL {
-                ShareLink(item: backupURL) {
-                    dataRow(icon: "arrow.up.doc", label: "Backup JSON")
+                if let backupURL {
+                    ShareLink(item: backupURL) {
+                        SettingsRow(icon: "tray.and.arrow.down.fill", pastel: .sky, label: "Backup JSON")
+                    }
+                    .buttonStyle(.plain)
+                    rowDivider
                 }
+                Button {
+                    showingImporter = true
+                } label: {
+                    SettingsRow(icon: "tray.and.arrow.up.fill", pastel: .peach, label: "Restore from Backup")
+                }
+                .buttonStyle(.plain)
             }
-            Button {
-                showingImporter = true
-            } label: {
-                dataRow(icon: "arrow.down.doc", label: "Restore from Backup")
-            }
-        } header: {
-            sectionHeader("Data")
         } footer: {
             Text("Export your transactions as a spreadsheet, or back up and restore your full database as a JSON file.")
-                .font(.appSans(AppTheme.Typography.fontLabel))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
-    }
-
-    private func dataRow(icon: String, label: String) -> some View {
-        Label {
-            Text(label)
-                .font(.appSans(AppTheme.Typography.fontBody))
-                .foregroundStyle(AppTheme.Colors.textPrimary)
-        } icon: {
-            Image(systemName: icon)
-                .foregroundStyle(AppTheme.Colors.accent)
         }
     }
 
@@ -220,79 +206,47 @@ struct SettingsView: View {
     }
 
     private var resetSection: some View {
-        Section {
-            Button {
-                showingClearMonthConfirm = true
-            } label: {
-                resetRow(
-                    icon: "calendar.badge.minus",
-                    label: "Clear This Month's Transactions",
-                    subtitle: currentMonthTransactionCount == 0
-                        ? "No transactions in \(currentMonthLabel)"
-                        : "\(currentMonthTransactionCount) in \(currentMonthLabel)"
-                )
-            }
+        SettingsSectionCard(title: "Reset") {
+            VStack(spacing: 0) {
+                Button {
+                    showingClearMonthConfirm = true
+                } label: {
+                    SettingsRow(
+                        icon: "calendar.badge.minus",
+                        pastel: .rose,
+                        label: "Clear This Month's Transactions",
+                        subtitle: currentMonthTransactionCount == 0
+                            ? "No transactions in \(currentMonthLabel)"
+                            : "\(currentMonthTransactionCount) in \(currentMonthLabel)"
+                    )
+                }
+                .buttonStyle(.plain)
 
-            Button(role: .destructive) {
-                showingWipeAllConfirm = true
-            } label: {
-                resetRow(
-                    icon: "trash.fill",
-                    label: "Erase All App Data",
-                    subtitle: "Start over from scratch",
-                    destructive: true
-                )
+                rowDivider
+
+                Button(role: .destructive) {
+                    showingWipeAllConfirm = true
+                } label: {
+                    SettingsRow(
+                        icon: "trash.fill",
+                        pastel: .rose,
+                        label: "Erase All App Data",
+                        subtitle: "Start over from scratch",
+                        labelColor: AppTheme.Colors.danger
+                    )
+                }
+                .buttonStyle(.plain)
             }
-        } header: {
-            sectionHeader("Reset")
         } footer: {
             Text("Clear month removes only this month's income and expense records. Erase all data resets the entire app to its default setup.")
-                .font(.appSans(AppTheme.Typography.fontLabel))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
-    }
-
-    private func resetRow(
-        icon: String,
-        label: String,
-        subtitle: String,
-        destructive: Bool = false
-    ) -> some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            Image(systemName: icon)
-                .foregroundStyle(destructive ? AppTheme.Colors.danger : AppTheme.Colors.accent)
-                .frame(width: 24)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .font(.appSans(AppTheme.Typography.fontBody))
-                    .foregroundStyle(destructive ? AppTheme.Colors.danger : AppTheme.Colors.textPrimary)
-                Text(subtitle)
-                    .font(.appSans(AppTheme.Typography.fontLabel))
-                    .foregroundStyle(AppTheme.Colors.textMuted)
-            }
         }
     }
 
     // MARK: - Section 5: About
 
     private var aboutSection: some View {
-        Section {
-            HStack {
-                Label {
-                    Text("Version")
-                        .font(.appSans(AppTheme.Typography.fontBody))
-                        .foregroundStyle(AppTheme.Colors.textPrimary)
-                } icon: {
-                    Image(systemName: "info.circle.fill")
-                        .foregroundStyle(AppTheme.Colors.accent)
-                }
-                Spacer()
-                Text(versionString)
-                    .font(.appSans(AppTheme.Typography.fontBody))
-                    .foregroundStyle(AppTheme.Colors.textMuted)
-            }
-        } header: {
-            sectionHeader("About")
+        SettingsSectionCard(title: "About") {
+            SettingsRow(icon: "info.circle.fill", pastel: .sand, label: "Version", trailingText: versionString)
         }
     }
 
@@ -302,13 +256,11 @@ struct SettingsView: View {
         return "\(short) (\(build))"
     }
 
-    // MARK: - Shared Header
-
-    private func sectionHeader(_ text: String) -> some View {
-        Text(text.uppercased())
-            .font(.appSans(AppTheme.Typography.fontCaption, weight: .semibold))
-            .tracking(1.2)
-            .foregroundStyle(AppTheme.Colors.textMuted)
+    /// Hairline divider between rows within a section card, inset past the icon badge.
+    private var rowDivider: some View {
+        Divider()
+            .overlay(AppTheme.Colors.borderAlt)
+            .padding(.leading, AppTheme.Spacing.md + 32 + AppTheme.Spacing.md)
     }
 
     // MARK: - Export Generation
@@ -434,9 +386,11 @@ struct SettingsView: View {
             resultMessage = count > 0
                 ? "Restored \(count) transaction\(count == 1 ? "" : "s") and all other backup data."
                 : "Restore completed, but this backup contains no transactions."
+            HapticManager.success()
         } catch {
             resultMessage = (error as? LocalizedError)?.errorDescription
                 ?? "Restore failed: \(error.localizedDescription)"
+            HapticManager.error()
         }
         showingResultAlert = true
     }
@@ -485,6 +439,88 @@ struct SettingsView: View {
             resultMessage = "Could not erase app data: \(error.localizedDescription)"
         }
         showingResultAlert = true
+    }
+}
+
+// MARK: - Section Card
+
+/// A titled group of rows in a single white surface card, matching the pastel
+/// card language used elsewhere in the app (see PlansView's PlanSectionCard).
+private struct SettingsSectionCard<Content: View, Footer: View>: View {
+    let title: String
+    let content: Content
+    let footer: Footer
+
+    init(title: String, @ViewBuilder content: () -> Content, @ViewBuilder footer: () -> Footer) {
+        self.title = title
+        self.content = content()
+        self.footer = footer()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            Text(title.uppercased())
+                .font(.appSans(AppTheme.Typography.fontCaption, weight: .semibold))
+                .tracking(1.2)
+                .foregroundStyle(AppTheme.Colors.textMuted)
+                .padding(.horizontal, AppTheme.Spacing.xs)
+
+            VStack(spacing: 0) { content }
+                .cardStyle(padding: 0)
+
+            footer
+                .font(.appSans(AppTheme.Typography.fontLabel))
+                .foregroundStyle(AppTheme.Colors.textMuted)
+                .padding(.horizontal, AppTheme.Spacing.xs)
+        }
+    }
+}
+
+private extension SettingsSectionCard where Footer == EmptyView {
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.init(title: title, content: content, footer: { EmptyView() })
+    }
+}
+
+/// A single row inside a `SettingsSectionCard`: a pastel IconBadge, label
+/// (with optional subtitle), and an optional trailing value/chevron.
+private struct SettingsRow: View {
+    let icon: String
+    let pastel: PastelStyle
+    let label: String
+    var subtitle: String? = nil
+    var trailingText: String? = nil
+    var showChevron: Bool = false
+    var labelColor: Color = AppTheme.Colors.textPrimary
+
+    var body: some View {
+        HStack(spacing: AppTheme.Spacing.md) {
+            IconBadge(symbol: icon, style: pastel, size: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.appSans(AppTheme.Typography.fontBody, weight: .medium))
+                    .foregroundStyle(labelColor)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.appSans(AppTheme.Typography.fontLabel))
+                        .foregroundStyle(AppTheme.Colors.textMuted)
+                }
+            }
+            Spacer()
+            if let trailingText {
+                Text(trailingText)
+                    .font(.appSans(AppTheme.Typography.fontLabel))
+                    .foregroundStyle(AppTheme.Colors.textMuted)
+            }
+            if showChevron {
+                Image(systemName: "chevron.right")
+                    .font(.appSans(AppTheme.Typography.fontLabel, weight: .semibold))
+                    .foregroundStyle(AppTheme.Colors.textMuted)
+            }
+        }
+        .padding(.horizontal, AppTheme.Spacing.md)
+        .padding(.vertical, AppTheme.Spacing.sm + 2)
+        .contentShape(Rectangle())
     }
 }
 

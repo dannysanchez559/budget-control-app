@@ -122,7 +122,9 @@ struct AllTransactionsView: View {
                     .font(.appSans(15, weight: .semibold))
                     .tint(AppTheme.Colors.danger)
             }
+        }
 
+        ToolbarItemGroup(placement: .topBarTrailing) {
             if !isSelecting {
                 Button { sortMode = sortMode.next } label: {
                     Image(systemName: sortMode.iconName)
@@ -220,17 +222,12 @@ struct AllTransactionsView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: "list.bullet.rectangle")
-                .font(.system(size: 40))
-                .foregroundStyle(AppTheme.Colors.textMuted.opacity(0.5))
-            Text("No transactions yet")
-                .font(.appSerif(16))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-            Text("Tap + to add your first record")
-                .font(.appSans(13))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
+        EmptyStateView(
+            symbol: "list.bullet.rectangle",
+            pastel: .lavender,
+            title: "No transactions yet",
+            subtitle: "Tap + to add your first record"
+        )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 

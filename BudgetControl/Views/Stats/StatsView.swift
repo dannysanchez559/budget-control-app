@@ -220,16 +220,7 @@ struct StatsView: View {
     }
 
     private var breakdownEmptyState: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: "chart.pie")
-                .font(.system(size: 40))
-                .foregroundStyle(AppTheme.Colors.textMuted.opacity(0.5))
-            Text("No spending data yet")
-                .font(.appSans(16))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
+        EmptyStateView(symbol: "chart.pie.fill", pastel: .sky, title: "No spending data yet")
     }
 
     // MARK: - Budgets
@@ -268,10 +259,7 @@ struct StatsView: View {
             }
 
             if budgetRows.isEmpty {
-                Text("Tap Manage to set spending limits")
-                    .font(.appSans(AppTheme.Typography.fontBody))
-                    .foregroundStyle(AppTheme.Colors.textMuted)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                EmptyStateView(symbol: "chart.bar.fill", pastel: .sky, title: "Tap Manage to set spending limits")
             } else {
                 ForEach(budgetRows) { row in
                     budgetRowView(row)

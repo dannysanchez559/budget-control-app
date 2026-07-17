@@ -265,6 +265,8 @@ struct HomeView: View {
             Text(store.formatAmount(amount))
                 .font(.appSans(AppTheme.Typography.fontCardNumber, weight: .semibold))
                 .foregroundStyle(.white)
+                .contentTransition(.numericText())
+                .animation(.easeOut(duration: 0.3), value: amount)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
@@ -519,19 +521,12 @@ struct HomeView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: "wallet.bifold")
-                .font(.system(size: 40))
-                .foregroundStyle(AppTheme.Colors.textMuted.opacity(0.5))
-            Text("No entries yet")
-                .font(.appSans(16, weight: .semibold))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-            Text("Tap + to add your first record")
-                .font(.appSans(13))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
+        EmptyStateView(
+            symbol: "wallet.bifold",
+            pastel: .peach,
+            title: "No entries yet",
+            subtitle: "Tap + to add your first record"
+        )
     }
 
     // MARK: - Section Header Helper

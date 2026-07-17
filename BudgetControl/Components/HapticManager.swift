@@ -24,6 +24,20 @@ enum HapticManager {
         generator.notificationOccurred(.success)
     }
 
+    /// A warning notification — used when a budget crosses its 80% threshold.
+    static func warning() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.warning)
+    }
+
+    /// An error notification — used when a backup restore fails.
+    static func error() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.error)
+    }
+
     /// A light tap — used for the floating add button.
     static func light() {
         impact(.light)

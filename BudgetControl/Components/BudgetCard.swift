@@ -18,6 +18,9 @@ struct BudgetCard: View {
     var limit: Double?
     var index: Int
 
+    // Drives the progress bar filling from zero when the card first appears.
+    @State private var appeared = false
+
     private let cardPadding: CGFloat = 16
 
     private var pastel: PastelStyle { IconMap.pastel(forIndex: index) }
@@ -78,6 +81,11 @@ struct BudgetCard: View {
         .background(pastel.fill)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .opacity(hasLimit ? 1 : 0.82)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.4).delay(0.1)) {
+                appeared = true
+            }
+        }
     }
 
     private var progressBar: some View {
@@ -87,7 +95,7 @@ struct BudgetCard: View {
                     .fill(pastel.text.opacity(0.15))
                 Capsule()
                     .fill(pastel.text)
-                    .frame(width: geo.size.width * ratio)
+                    .frame(width: (appeared ? ratio : 0) * geo.size.width)
             }
         }
         .frame(height: 4)

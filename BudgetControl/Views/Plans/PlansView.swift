@@ -124,19 +124,6 @@ private struct PlanProgressBar: View {
     }
 }
 
-/// An empty-state line shown when a section has no records yet.
-private struct PlanEmptyRow: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(.appSans(AppTheme.Typography.fontBody))
-            .foregroundStyle(AppTheme.Colors.textMuted)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, AppTheme.Spacing.sm)
-    }
-}
-
 /// Wraps a whole section as a contained module: the header + Add button at the
 /// top, a divider, then the section's content rows — all inside one surface
 /// card. Each section supplies its header parameters and a content builder.
@@ -250,7 +237,7 @@ private struct RecurringSection: View {
             showingForm = true
         } content: {
             if rules.isEmpty {
-                PlanEmptyRow(text: "No recurring rules yet")
+                EmptyStateView(symbol: "arrow.triangle.2.circlepath", pastel: .peach, title: "No recurring rules yet")
             } else {
                 VStack(spacing: AppTheme.Spacing.sm) {
                     ForEach(rules) { rule in
@@ -316,7 +303,7 @@ private struct TripsSection: View {
             showingForm = true
         } content: {
             if trips.isEmpty {
-                PlanEmptyRow(text: "No trips yet")
+                EmptyStateView(symbol: "airplane", pastel: .sky, title: "No trips yet")
             } else {
                 VStack(spacing: AppTheme.Spacing.sm) {
                     ForEach(trips) { trip in
@@ -398,6 +385,7 @@ private struct TripsSection: View {
         trip.isActive = activating
         store.activeTripId = activating ? trip.id : nil
         try? modelContext.save()
+        HapticManager.impact()
     }
 
     private func delete(_ trip: Trip) {
@@ -424,14 +412,17 @@ private struct SavingsGoalsSection: View {
             showingForm = true
         } content: {
             if goals.isEmpty {
-                PlanEmptyRow(text: "No savings goals yet")
+                EmptyStateView(symbol: "target", pastel: .mint, title: "No savings goals yet")
             } else {
                 VStack(spacing: AppTheme.Spacing.sm) {
                     ForEach(goals) { goal in
                         SwipeToDeleteContainer(confirmTitle: "Delete this goal?") {
                             delete(goal)
                         } content: {
-                            goalCard(goal)
+                            SavingsGoalCard(goal: goal) {
+                                depositText = ""
+                                goalForDeposit = goal
+                            }
                         }
                     }
                 }
@@ -453,45 +444,6 @@ private struct SavingsGoalsSection: View {
         }
     }
 
-    private func goalCard(_ goal: SavingsGoal) -> some View {
-        let complete = goal.saved >= goal.target && goal.target > 0
-        let ratio = goal.target > 0 ? goal.saved / goal.target : 0
-        return VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            HStack(spacing: AppTheme.Spacing.sm) {
-                IconBadge(
-                    symbol: planSymbol(goal.emoji, fallback: "target"),
-                    style: .mint,
-                    size: 40
-                )
-                Text(goal.name)
-                    .font(.appSans(AppTheme.Typography.fontBody, weight: .semibold))
-                    .foregroundStyle(AppTheme.Colors.textPrimary)
-                if complete {
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 16))
-                        .foregroundStyle(AppTheme.Colors.income)
-                }
-                Spacer()
-                Button {
-                    depositText = ""
-                    goalForDeposit = goal
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundStyle(AppTheme.Colors.accent)
-                }
-                .buttonStyle(.plain)
-            }
-
-            PlanProgressBar(ratio: ratio, color: complete ? AppTheme.Colors.income : AppTheme.Colors.accent)
-
-            Text("\(store.formatAmount(goal.saved)) / \(store.formatAmount(goal.target))")
-                .font(.appSans(AppTheme.Typography.fontLabel, weight: .medium))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
-        .planRow()
-    }
-
     private func commitDeposit() {
         defer { depositText = ""; goalForDeposit = nil }
         guard let goal = goalForDeposit,
@@ -510,6 +462,69 @@ private struct SavingsGoalsSection: View {
     private func delete(_ goal: SavingsGoal) {
         modelContext.delete(goal)
         try? modelContext.save()
+    }
+}
+
+/// A savings goal row: progress bar, deposit button, and a checkmark badge
+/// that pulses briefly the moment the goal first reaches 100%.
+private struct SavingsGoalCard: View {
+    @Environment(DataStore.self) private var store
+
+    let goal: SavingsGoal
+    let onDeposit: () -> Void
+
+    @State private var checkmarkScale: CGFloat = 1.0
+    @State private var wasComplete = false
+
+    private var complete: Bool { goal.saved >= goal.target && goal.target > 0 }
+    private var ratio: Double { goal.target > 0 ? goal.saved / goal.target : 0 }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            HStack(spacing: AppTheme.Spacing.sm) {
+                IconBadge(
+                    symbol: planSymbol(goal.emoji, fallback: "target"),
+                    style: .mint,
+                    size: 40
+                )
+                Text(goal.name)
+                    .font(.appSans(AppTheme.Typography.fontBody, weight: .semibold))
+                    .foregroundStyle(AppTheme.Colors.textPrimary)
+                if complete {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(AppTheme.Colors.income)
+                        .scaleEffect(checkmarkScale)
+                }
+                Spacer()
+                Button(action: onDeposit) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundStyle(AppTheme.Colors.accent)
+                }
+                .buttonStyle(.plain)
+            }
+
+            PlanProgressBar(ratio: ratio, color: complete ? AppTheme.Colors.income : AppTheme.Colors.accent)
+
+            Text("\(store.formatAmount(goal.saved)) / \(store.formatAmount(goal.target))")
+                .font(.appSans(AppTheme.Typography.fontLabel, weight: .medium))
+                .foregroundStyle(AppTheme.Colors.textMuted)
+        }
+        .planRow()
+        .onAppear { wasComplete = complete }
+        .onChange(of: goal.saved) { _, _ in
+            if complete && !wasComplete {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                    checkmarkScale = 1.08
+                } completion: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                        checkmarkScale = 1.0
+                    }
+                }
+            }
+            wasComplete = complete
+        }
     }
 }
 
@@ -535,14 +550,14 @@ private struct SubscriptionsSection: View {
             showingForm = true
         } content: {
             if subscriptions.isEmpty {
-                PlanEmptyRow(text: "No subscriptions yet")
+                EmptyStateView(symbol: "creditcard.fill", pastel: .lavender, title: "No subscriptions yet")
             } else {
                 VStack(spacing: AppTheme.Spacing.sm) {
-                    ForEach(subscriptions) { sub in
+                    ForEach(Array(subscriptions.enumerated()), id: \.element.id) { index, sub in
                         SwipeToDeleteContainer(confirmTitle: "Delete this subscription?") {
                             delete(sub)
                         } content: {
-                            subscriptionRow(sub)
+                            subscriptionRow(sub, index: index)
                         }
                     }
                     totalFooter
@@ -554,11 +569,11 @@ private struct SubscriptionsSection: View {
         }
     }
 
-    private func subscriptionRow(_ sub: Subscription) -> some View {
+    private func subscriptionRow(_ sub: Subscription, index: Int) -> some View {
         HStack(spacing: AppTheme.Spacing.md) {
             IconBadge(
-                symbol: planSymbol(sub.emoji, fallback: "creditcard.fill"),
-                style: .lavender,
+                symbol: planSymbol(sub.emoji, fallback: "tv.fill"),
+                style: IconMap.pastel(forIndex: index),
                 size: 44
             )
             Text(sub.name)
@@ -831,6 +846,7 @@ private struct RecurringFormView: View {
         )
         modelContext.insert(rule)
         try? modelContext.save()
+        HapticManager.impact()
         dismiss()
     }
 }
@@ -900,6 +916,7 @@ private struct TripFormView: View {
         let trip = Trip(name: name.trimmingCharacters(in: .whitespaces), budget: budget, isActive: false)
         modelContext.insert(trip)
         try? modelContext.save()
+        HapticManager.impact()
         dismiss()
     }
 }
@@ -1016,6 +1033,7 @@ private struct SavingsGoalFormView: View {
         )
         modelContext.insert(goal)
         try? modelContext.save()
+        HapticManager.impact()
         dismiss()
     }
 }
@@ -1151,6 +1169,7 @@ private struct SubscriptionFormView: View {
         )
         modelContext.insert(sub)
         try? modelContext.save()
+        HapticManager.impact()
         dismiss()
     }
 }

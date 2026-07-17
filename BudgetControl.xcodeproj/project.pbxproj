@@ -36,6 +36,7 @@
 		82C2E7433E3D047DB2A8767F /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B21CABB8C15E678901C132E /* AppTheme.swift */; };
 		9036EB163B06B74D45095A5D /* TransactionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357D4B84368ABBF084596D7D /* TransactionRowView.swift */; };
 		941D6968F4BCB0CD7112F80D /* IconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E223B27FBEDE2C90C9EFC674 /* IconBadge.swift */; };
+		5B1975C421FA1322CC2D0EB9 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A381749FF82D3A271FEF92 /* EmptyStateView.swift */; };
 		9513DE457872E7700D29F816 /* AppIconPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F49C9ECD77973EFCDEF43 /* AppIconPreview.swift */; };
 		9A3DB8E0DC1A503D9B73C909 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62276F643DE4FD5924B8B8E /* Subscription.swift */; };
 		A5749E6A362DB0096683C2C0 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC787910DF751C452C8CBFC4 /* SearchView.swift */; };
@@ -92,6 +93,7 @@
 		D5B801CCB3DF8E96F2C6B0BE /* TransactionGrouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionGrouping.swift; sourceTree = "<group>"; };
 		DBBE9BD863EBE93D9220B0AE /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		E223B27FBEDE2C90C9EFC674 /* IconBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconBadge.swift; sourceTree = "<group>"; };
+		18A381749FF82D3A271FEF92 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		E56D9EB8196844699FDE314F /* BackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestore.swift; sourceTree = "<group>"; };
 		E5C6D698DD3288F27F496523 /* AllTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllTransactionsView.swift; sourceTree = "<group>"; };
 		F0AC9B2A30FBAF33D6261038 /* CardPaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPaymentView.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				A07B38236381258F10233B9E /* FloatingAddButton.swift */,
 				44903CD83B328C8B9A7FEDD4 /* HapticManager.swift */,
 				E223B27FBEDE2C90C9EFC674 /* IconBadge.swift */,
+				18A381749FF82D3A271FEF92 /* EmptyStateView.swift */,
 				79D70AF7C3F1F6ACED013BE7 /* IconMap.swift */,
 				0B70F88CA6AB94E5CB0E5079 /* PastelCard.swift */,
 				89FA4E95BF6FF762F9013328 /* PrimaryButton.swift */,
@@ -365,6 +368,7 @@
 				05076B74CBD95A22BDE29923 /* HapticManager.swift in Sources */,
 				4906658403659DB8A97BDB5E /* HomeView.swift in Sources */,
 				941D6968F4BCB0CD7112F80D /* IconBadge.swift in Sources */,
+				5B1975C421FA1322CC2D0EB9 /* EmptyStateView.swift in Sources */,
 				AB1D90D4962EB9658C858E14 /* IconMap.swift in Sources */,
 				6E22681429E6C11D74744E7F /* MainTabView.swift in Sources */,
 				E92A6E59B427C4941849C0A8 /* OnboardingView.swift in Sources */,
@@ -453,9 +457,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = NDNN4592Y3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -464,6 +470,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.developerNatalia.budgetcontrol;
 				PRODUCT_NAME = "Budget Control";
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -474,9 +483,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = NDNN4592Y3;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				INFOPLIST_FILE = BudgetControl/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -485,6 +496,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.developerNatalia.budgetcontrol;
 				PRODUCT_NAME = "Budget Control";
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

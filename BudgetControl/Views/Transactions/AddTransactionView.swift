@@ -44,6 +44,7 @@ struct AddTransactionView: View {
 
     @Query(sort: \Wallet.name) private var wallets: [Wallet]
     @Query(sort: \AppCategory.label) private var categories: [AppCategory]
+    @Query private var allTransactions: [Transaction]
 
     @State private var type: String = "expense"
     @State private var amountText: String = ""
@@ -141,6 +142,7 @@ struct AddTransactionView: View {
     private func typeSegment(title: String, value: String, color: Color) -> some View {
         let isSelected = type == value
         return Button {
+            HapticManager.light()
             type = value
         } label: {
             Text(title)
@@ -190,6 +192,7 @@ struct AddTransactionView: View {
                     }
                 }
                 .padding(.horizontal, 1) // keeps stroke from clipping
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: walletId)
             }
         }
     }
@@ -197,6 +200,7 @@ struct AddTransactionView: View {
     private func walletChip(_ wallet: Wallet, index: Int) -> some View {
         let isSelected = wallet.id == walletId
         return Button {
+            HapticManager.light()
             walletId = wallet.id
         } label: {
             HStack(spacing: 8) {
@@ -235,12 +239,14 @@ struct AddTransactionView: View {
                 }
                 newCategoryCell
             }
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: categoryId)
         }
     }
 
     private func categoryCell(_ category: AppCategory) -> some View {
         let isSelected = category.id == categoryId
         return Button {
+            HapticManager.light()
             categoryId = category.id
         } label: {
             VStack(spacing: 6) {
@@ -385,8 +391,34 @@ struct AddTransactionView: View {
             .filter { !$0.isEmpty }
     }
 
+    /// Month-to-date spend for a category, excluding the transaction currently
+    /// being edited so its old amount/category doesn't double-count.
+    private func monthSpent(for categoryId: String) -> Double {
+        allTransactions
+            .filter {
+                $0.categoryId == categoryId && $0.type == "expense" && $0.id != editing?.id
+                    && Calendar.current.isDate($0.date, equalTo: .now, toGranularity: .month)
+            }
+            .reduce(0) { $0 + $1.amount }
+    }
+
+    /// Fires a warning haptic the moment this save pushes a budgeted category
+    /// from under 80% of its monthly limit to 80% or over.
+    private func checkBudgetThreshold(beforeSpent: Double) {
+        guard type == "expense",
+              Calendar.current.isDate(date, equalTo: .now, toGranularity: .month),
+              let limit = store.budgetLimits[categoryId], limit > 0
+        else { return }
+        let afterSpent = beforeSpent + amountValue
+        if beforeSpent / limit < 0.8, afterSpent / limit >= 0.8 {
+            HapticManager.warning()
+        }
+    }
+
     private func save() {
         guard canSave else { return }
+
+        let beforeSpent = monthSpent(for: categoryId)
 
         // Auto-tag to the active trip for expenses; preserve an existing trip tag on edit.
         let tripId: String? = {
@@ -420,6 +452,7 @@ struct AddTransactionView: View {
         }
 
         try? modelContext.save()
+        checkBudgetThreshold(beforeSpent: beforeSpent)
         HapticManager.impact()
         dismiss()
     }

@@ -332,16 +332,7 @@ struct CalendarView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: "calendar")
-                .font(.system(size: 32))
-                .foregroundStyle(AppTheme.Colors.textMuted.opacity(0.5))
-            Text("No transactions on this day")
-                .font(.appSans(AppTheme.Typography.fontBody))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, AppTheme.Spacing.lg)
+        EmptyStateView(symbol: "calendar", pastel: .sky, title: "No transactions on this day")
     }
 
     // MARK: - Actions

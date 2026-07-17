@@ -112,12 +112,14 @@ struct SearchView: View {
         if trimmedQuery.isEmpty {
             placeholder(
                 icon: "magnifyingglass",
+                pastel: .sky,
                 title: "Search your transactions",
                 subtitle: "Find by note, category, wallet, amount, or tag"
             )
         } else if results.isEmpty {
             placeholder(
                 icon: "doc.text.magnifyingglass",
+                pastel: .rose,
                 title: "No results",
                 subtitle: "Nothing matches “\(query)”"
             )
@@ -143,21 +145,10 @@ struct SearchView: View {
         .scrollContentBackground(.hidden)
     }
 
-    private func placeholder(icon: String, title: String, subtitle: String) -> some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: icon)
-                .font(.system(size: 40))
-                .foregroundStyle(AppTheme.Colors.textMuted.opacity(0.5))
-            Text(title)
-                .font(.appSerif(16))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-            Text(subtitle)
-                .font(.appSans(13))
-                .foregroundStyle(AppTheme.Colors.textMuted)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.horizontal, AppTheme.Spacing.lg)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private func placeholder(icon: String, pastel: PastelStyle, title: String, subtitle: String) -> some View {
+        EmptyStateView(symbol: icon, pastel: pastel, title: title, subtitle: subtitle)
+            .padding(.horizontal, AppTheme.Spacing.lg)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

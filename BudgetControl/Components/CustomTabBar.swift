@@ -14,6 +14,8 @@ import SwiftUI
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
 
+    @Namespace private var activeDotNamespace
+
     private struct TabItem {
         let icon: String
         let label: String
@@ -46,6 +48,7 @@ struct CustomTabBar: View {
                 .fill(AppTheme.Colors.border)
                 .frame(height: 1)
         }
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedTab)
     }
 
     private func tabButton(index: Int, tab: TabItem) -> some View {
@@ -53,6 +56,7 @@ struct CustomTabBar: View {
         let color = isActive ? AppTheme.Colors.accent : AppTheme.Colors.textMuted
 
         return Button {
+            HapticManager.light()
             selectedTab = index
         } label: {
             VStack(spacing: 4) {
@@ -60,10 +64,14 @@ struct CustomTabBar: View {
                     .font(.system(size: 22))
                     .foregroundStyle(color)
 
-                RoundedRectangle(cornerRadius: 2, style: .continuous)
-                    .fill(AppTheme.Colors.accent)
-                    .frame(width: 4, height: 4)
-                    .opacity(isActive ? 1 : 0)
+                ZStack {
+                    if isActive {
+                        RoundedRectangle(cornerRadius: 2, style: .continuous)
+                            .fill(AppTheme.Colors.accent)
+                            .matchedGeometryEffect(id: "activeDot", in: activeDotNamespace)
+                    }
+                }
+                .frame(width: 4, height: 4)
 
                 Text(tab.label)
                     .font(.appSans(9, weight: .medium))
