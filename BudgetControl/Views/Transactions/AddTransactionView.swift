@@ -150,7 +150,13 @@ struct AddTransactionView: View {
                 .foregroundStyle(isSelected ? .white : AppTheme.Colors.textMuted)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
-                .background(isSelected ? color : Color.clear)
+                .background(
+                    LinearGradient(
+                        colors: isSelected ? [color, color.darker(by: 0.18)] : [.clear, .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -455,6 +461,19 @@ struct AddTransactionView: View {
         checkBudgetThreshold(beforeSpent: beforeSpent)
         HapticManager.impact()
         dismiss()
+    }
+}
+
+// MARK: - Color Helper
+
+private extension Color {
+    /// Returns a deeper variant of this color by reducing its HSB brightness —
+    /// used for the active type-toggle segment's gradient.
+    func darker(by amount: CGFloat) -> Color {
+        let uiColor = UIColor(self)
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+        uiColor.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        return Color(hue: hue, saturation: saturation, brightness: max(0, brightness - amount), opacity: alpha)
     }
 }
 
