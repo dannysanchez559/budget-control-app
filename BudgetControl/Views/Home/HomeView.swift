@@ -112,7 +112,7 @@ struct HomeView: View {
     private var header: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Good morning")
+                Text(greeting)
                     .font(.appSans(AppTheme.Typography.fontCaption, weight: .semibold))
                     .foregroundStyle(AppTheme.Colors.textMuted)
                 Text(monthTitle)
@@ -147,6 +147,15 @@ struct HomeView: View {
     private var monthTitle: String {
         _ = store.calendarPeriodId
         return Date.now.formatted(.dateTime.month(.wide).year())
+    }
+
+    private var greeting: String {
+        switch Calendar.current.component(.hour, from: Date.now) {
+        case 5...11: return "Good morning"
+        case 12...16: return "Good afternoon"
+        case 17...20: return "Good evening"
+        default: return "Good night"
+        }
     }
 
     // MARK: - Active Trip Banner
